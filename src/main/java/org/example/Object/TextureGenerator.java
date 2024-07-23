@@ -37,7 +37,8 @@ public class TextureGenerator {
 		return texture_generator;
 	}
 
-	public void draw(int width, int height, Transform transform, short[] texture_data) {
+	// Takes width and height of world (pixels that fit on screen), of the object, the object transform and the texture data
+	public void draw(double world_width, double world_height, int width, int height, Transform transform, short[] texture_data) {
 
 		if (width * height != texture_data.length) {
 			throw new Error("Texture generation error: invalid texture dimensions for array size");
@@ -47,7 +48,7 @@ public class TextureGenerator {
 		glTexImage2D(
 				GL_TEXTURE_2D,
 				0,
-				GL_RGB565,
+				GL_RGB5_A1,
 				width,
 				height,
 				GL_FALSE,
@@ -59,13 +60,13 @@ public class TextureGenerator {
 		//ToDo: apply the transform to the vertex data here
 		glBegin(GL_QUADS);
 		glTexCoord2f(0.0f,0.0f);
-		glVertex3f(-1.0f,-1.0f, 0.0f);
+		glVertex3d((-1.0 + transform.x),(-1.0 + transform.y), 0.0f);
 		glTexCoord2f(1.0f,0.0f);
-		glVertex3f(1.0f,-1.0f, 0.0f);
+		glVertex3d(1.0 + transform.x,-1.0 + transform.y, 0.0f);
 		glTexCoord2f(1.0f,1.0f);
-		glVertex3f(1.0f,1.0f, 0.0f);
+		glVertex3d(1.0 + transform.x,1.0 + transform.y, 0.0f);
 		glTexCoord2f(0.0f,1.0f);
-		glVertex3f(-1.0f,1.0f, 0.0f);
+		glVertex3d(-1.0 + transform.x,1.0 + transform.y, 0.0f);
 		glEnd();
 	}
 }

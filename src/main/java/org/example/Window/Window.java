@@ -3,6 +3,7 @@ package org.example.Window;
 import org.example.Listeners.KeyListener;
 import org.example.Listeners.MouseListener;
 import org.example.Util.Time;
+import org.lwjgl.BufferUtils;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL;
@@ -11,6 +12,9 @@ import org.lwjgl.system.MemoryStack;
 import java.nio.IntBuffer;
 import java.util.Objects;
 
+import org.lwjgl.BufferUtils.*;
+
+import static java.awt.SystemColor.window;
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.glfw.GLFW.glfwShowWindow;
@@ -33,6 +37,7 @@ public class Window {
 	public Window() {
 
 	}
+
 	public void init(int width, int height, String title) {
 		this.width = width;
 		this.height = height;
@@ -98,8 +103,9 @@ public class Window {
 		// Make the window visible
 		glfwShowWindow(glfw_window);
 		GL.createCapabilities();
-
 	}
+
+	public long get_glfw_window() { return glfw_window; }
 
 	public float update() {
 		glfwPollEvents();

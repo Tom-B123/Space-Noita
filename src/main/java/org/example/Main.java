@@ -17,16 +17,19 @@ public class Main {
 
     private void init() {
         this.window = new Window();
-        this.window.init(1920,1080,"Spoils of War 2");
+        this.window.init(1000,1080,"Spoils of War 2");
         this.world = new World();
-        this.world.init();
+        this.world.init(window.get_glfw_window());
     }
 
     private void loop() {
+        float dt;
         while (!window.should_close()) {
             this.window.clear();
 
-            this.window.update();
+            dt = this.window.update();
+
+            this.world.update(dt);
 
             this.world.draw();
 
