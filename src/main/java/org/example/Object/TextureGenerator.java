@@ -2,6 +2,8 @@ package org.example.Object;
 
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL12.GL_UNSIGNED_SHORT_5_5_5_1;
+import static org.lwjgl.opengl.GL12.GL_UNSIGNED_SHORT_5_6_5;
+import static org.lwjgl.opengl.GL41.GL_RGB565;
 
 public class TextureGenerator {
 
@@ -37,7 +39,7 @@ public class TextureGenerator {
 
 	public void draw(int width, int height, Transform transform, short[] texture_data) {
 
-		if (width * height * 3 != texture_data.length) {
+		if (width * height != texture_data.length) {
 			throw new Error("Texture generation error: invalid texture dimensions for array size");
 		}
 
@@ -45,12 +47,12 @@ public class TextureGenerator {
 		glTexImage2D(
 				GL_TEXTURE_2D,
 				0,
-				GL_RGB,
+				GL_RGB565,
 				width,
 				height,
 				GL_FALSE,
-				GL_RGB,
-				GL_UNSIGNED_SHORT,
+				GL_RGBA,
+				GL_UNSIGNED_SHORT_5_5_5_1,
 				texture_data
 		);
 

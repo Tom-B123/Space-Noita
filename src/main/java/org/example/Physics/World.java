@@ -21,14 +21,22 @@ public class World {
 	private int height;
 
 	public void init() {
-		this.width = 50;
+		this.width = 89;
 		this.height = 50;
 		this.texture_generator = TextureGenerator.get();
 		this.temp_transform = new Transform(0,0,0);
-		temp_image = new short[width * height * 3];
-		temp_image[0] = (short)30000;
-		temp_image[4] = (short)30000;
-		temp_image[8] = (short)30000;
+		temp_image = new short[width * height];
+		for (int y = 0; y < 32; y++) {
+			for (int x = 0; x < 32; x++) {
+				set_pixel(x,y,x,(x+y)/2,y,1);
+			}
+		}
+	}
+
+	private void set_pixel(int x, int y, int r, int g, int b,int a) {
+		int index = (x + y * this.width);
+		short colour = (short)(a + (b << 1) + (g << 6) + (r << 11));
+		this.temp_image[index] = colour;
 	}
 
 
