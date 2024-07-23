@@ -1,9 +1,8 @@
 package org.example.Object;
 
+import static java.lang.Math.*;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL12.GL_UNSIGNED_SHORT_5_5_5_1;
-import static org.lwjgl.opengl.GL12.GL_UNSIGNED_SHORT_5_6_5;
-import static org.lwjgl.opengl.GL41.GL_RGB565;
 
 public class TextureGenerator {
 
@@ -44,6 +43,15 @@ public class TextureGenerator {
 			throw new Error("Texture generation error: invalid texture dimensions for array size");
 		}
 
+		double sprite_width = world_width / width;
+		double sprite_height = world_height / height;
+
+		double small_angle = (double)transform.angle + atan((double)height / (double)width);
+		double big_angle = (PI * 0.5d) - small_angle;
+
+		double rotation = small_angle;
+		double magnitude = sqrt(width*width + height*height) * 0.5d;
+
 		// Takes height and width in world pixels, applies the transform and draws the texture
 		glTexImage2D(
 				GL_TEXTURE_2D,
@@ -57,16 +65,33 @@ public class TextureGenerator {
 				texture_data
 		);
 
-		//ToDo: apply the transform to the vertex data here
 		glBegin(GL_QUADS);
-		glTexCoord2f(0.0f,0.0f);
-		glVertex3d((-1.0 + transform.x),(-1.0 + transform.y), 0.0f);
-		glTexCoord2f(1.0f,0.0f);
-		glVertex3d(1.0 + transform.x,-1.0 + transform.y, 0.0f);
-		glTexCoord2f(1.0f,1.0f);
-		glVertex3d(1.0 + transform.x,1.0 + transform.y, 0.0f);
-		glTexCoord2f(0.0f,1.0f);
-		glVertex3d(-1.0 + transform.x,1.0 + transform.y, 0.0f);
+
+		// Draw the vertices of the quad
+		System.out.println("Quad: small [" + small_angle + "] big : [" + big_angle + "]");
+		for (int i = 0; i < 4; i++) {
+			glTexCoord2f((float)(((i+1)/2)%2),(float)(i/2));
+			glVertex3d(
+					transform.x / sprite_width + (cos(rotation) * magnitude) / sprite_width,
+					transform.y / sprite_height + (sin(rotation) * magnitude) / sprite_height,
+					0.0f
+			);
+
+			// insufferable rotation issue, works with hard coded PI/2 but nothing else!!!!!!!!!!!!!!!!!!!!!!!
+
+			System.out.println(rotation);
+			switch (i%2) {
+				case 0:
+					rotation += 2 * big_angle;
+					break;
+				case 1:
+					rotation += 2 * small_angle;
+					break;
+				default:
+					break;
+			}
+		}
+		System.out.println(rotation+small_angle);
 		glEnd();
 	}
 }

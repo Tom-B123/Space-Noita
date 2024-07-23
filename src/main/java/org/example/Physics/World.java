@@ -11,10 +11,9 @@ import static org.lwjgl.glfw.GLFW.glfwGetWindowSize;
 // A collection of objects which are all drawn to the screen
 public class World {
 	private Object[] objects;
-	private int scale;
+	private double scale;
 
 	private TextureGenerator texture_generator = null;
-
 
 	private Transform temp_transform;
 	private short[] temp_image;
@@ -32,18 +31,19 @@ public class World {
 
 	public void init(long glfw_window) {
 		this.width = 32;
-		this.height = 32;
+		this.height = 16;
+		this.scale = 0.4d;
 
 		this.glfw_window = glfw_window;
 
 		update_window_dims();
 
 		this.texture_generator = TextureGenerator.get();
-		this.temp_transform = new Transform(0,0,0);
+		this.temp_transform = new Transform(0,0,0.78f);
 		temp_image = new short[width * height];
-		for (int y = 0; y < 32; y++) {
-			for (int x = 0; x < 32; x++) {
-				set_pixel(x,y,x,(x+y)/2,y,1);
+		for (int y = 0; y < height; y++) {
+			for (int x = 0; x < width; x++) {
+				set_pixel(x,y,31 * ((x+y)%2),0,31 * ((x+y+1)%2),1);
 			}
 		}
 	}
@@ -63,12 +63,16 @@ public class World {
 		IntBuffer w = BufferUtils.createIntBuffer(1);
 		IntBuffer h = BufferUtils.createIntBuffer(1);
 		glfwGetWindowSize(this.glfw_window, w, h);
-		this.world_width = w.get(0);
-		this.world_height = h.get(0);
+		this.world_width = (double)w.get(0) / this.scale;
+		this.world_height = (double)h.get(0) / this.scale;
 	}
 
 	public void update(float dt) {
-		this.temp_transform.x += dt * 0.2;
+		//this.temp_transform.x += dt * 4;
+
+		//this.temp_transform.angle += 0.01d;
+
+		//this.scale += 0.1d;
 
 		update_window_dims();
 
