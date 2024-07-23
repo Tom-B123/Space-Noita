@@ -1,10 +1,12 @@
 package org.example;
 
+import org.example.Physics.World;
 import org.example.Window.Window;
 
 public class Main {
 
     private Window window;
+    private World world;
 
     private void start() {
         this.init();
@@ -14,14 +16,21 @@ public class Main {
     }
 
     private void init() {
-        this.window = new Window(1920,1080,"Spoils of War 2");
+        this.window = new Window();
+        this.window.init(1920,1080,"Spoils of War 2");
+        this.world = new World();
+        this.world.init();
     }
 
     private void loop() {
         while (!window.should_close()) {
-            window.clear();
-            window.update();
-            window.draw();
+            this.window.clear();
+
+            this.window.update();
+
+            this.world.draw();
+
+            this.window.draw();
         }
     }
 

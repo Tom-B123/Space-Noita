@@ -30,7 +30,10 @@ public class Window {
 	private float end_time;
 	private float dt = -1.0f;
 
-	public Window(int width, int height, String title) {
+	public Window() {
+
+	}
+	public void init(int width, int height, String title) {
 		this.width = width;
 		this.height = height;
 		this.title = title;
@@ -95,6 +98,7 @@ public class Window {
 		// Make the window visible
 		glfwShowWindow(glfw_window);
 		GL.createCapabilities();
+
 	}
 
 	public float update() {
@@ -116,7 +120,6 @@ public class Window {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the frame buffer
 	}
 	public void draw() {
-		//world.draw();
 		glfwSwapBuffers(this.glfw_window);
 	}
 	public void delete() {
