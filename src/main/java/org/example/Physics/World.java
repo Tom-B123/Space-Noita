@@ -32,18 +32,18 @@ public class World {
 	public void init(long glfw_window) {
 		this.width = 32;
 		this.height = 16;
-		this.scale = 0.4d;
+		this.scale = 4d;
 
 		this.glfw_window = glfw_window;
 
 		update_window_dims();
 
 		this.texture_generator = TextureGenerator.get();
-		this.temp_transform = new Transform(0,0,0.78f);
+		this.temp_transform = new Transform(0,0,0);
 		temp_image = new short[width * height];
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {
-				set_pixel(x,y,31 * ((x+y)%2),0,31 * ((x+y+1)%2),1);
+				set_pixel(x,y,x,0,y,1);
 			}
 		}
 	}
@@ -56,23 +56,23 @@ public class World {
 
 
 	public void draw() {
-		this.texture_generator.draw(world_width,world_height,width,height,this.temp_transform,temp_image);
+		this.texture_generator.draw(world_width,world_height,this.scale,width,height,this.temp_transform,temp_image);
 	}
 
 	private void update_window_dims() {
 		IntBuffer w = BufferUtils.createIntBuffer(1);
 		IntBuffer h = BufferUtils.createIntBuffer(1);
 		glfwGetWindowSize(this.glfw_window, w, h);
-		this.world_width = (double)w.get(0) / this.scale;
-		this.world_height = (double)h.get(0) / this.scale;
+		this.world_width = (double)w.get(0);
+		this.world_height = (double)h.get(0);
 	}
 
 	public void update(float dt) {
 		//this.temp_transform.x += dt * 4;
 
-		//this.temp_transform.angle += 0.01d;
+		this.temp_transform.angle += 0.01d;
 
-		//this.scale += 0.1d;
+		this.scale += 0.1d;
 
 		update_window_dims();
 

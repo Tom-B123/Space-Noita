@@ -37,7 +37,7 @@ public class TextureGenerator {
 	}
 
 	// Takes width and height of world (pixels that fit on screen), of the object, the object transform and the texture data
-	public void draw(double world_width, double world_height, int width, int height, Transform transform, short[] texture_data) {
+	public void draw(double world_width, double world_height, double world_scale, int width, int height, Transform transform, short[] texture_data) {
 
 		if (width * height != texture_data.length) {
 			throw new Error("Texture generation error: invalid texture dimensions for array size");
@@ -46,11 +46,11 @@ public class TextureGenerator {
 		double sprite_width = world_width / width;
 		double sprite_height = world_height / height;
 
-		double small_angle = (double)transform.angle + atan((double)height / (double)width);
+		double small_angle = atan((double)height / (double)width);
 		double big_angle = (PI * 0.5d) - small_angle;
 
-		double rotation = small_angle;
-		double magnitude = sqrt(width*width + height*height) * 0.5d;
+		double rotation = small_angle + (double)transform.angle;
+		double magnitude = sqrt(world_width*world_width + world_height*world_height);
 
 		// Takes height and width in world pixels, applies the transform and draws the texture
 		glTexImage2D(
@@ -72,12 +72,10 @@ public class TextureGenerator {
 		for (int i = 0; i < 4; i++) {
 			glTexCoord2f((float)(((i+1)/2)%2),(float)(i/2));
 			glVertex3d(
-					transform.x / sprite_width + (cos(rotation) * magnitude) / sprite_width,
-					transform.y / sprite_height + (sin(rotation) * magnitude) / sprite_height,
+					transform.x / world_scale + (cos(rotation) * height * world_scale / magnitude),
+					transform.y / world_scale + (sin(rotation) * width * world_scale / magnitude),
 					0.0f
 			);
-
-			// insufferable rotation issue, works with hard coded PI/2 but nothing else!!!!!!!!!!!!!!!!!!!!!!!
 
 			System.out.println(rotation);
 			switch (i%2) {
