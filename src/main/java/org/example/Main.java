@@ -16,7 +16,7 @@ public class Main {
     }
 
     private void init() {
-        this.window = new Window();
+        this.window = Window.get();
         this.window.init(1920,1080,"Spoils of War 2");
         this.world = new World();
         this.world.init(window.get_glfw_window());

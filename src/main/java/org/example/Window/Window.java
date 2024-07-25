@@ -34,8 +34,17 @@ public class Window {
 	private float end_time;
 	private float dt = -1.0f;
 
-	public Window() {
+	private static Window window = null;
 
+	private Window() {
+
+	}
+
+	public static Window get() {
+		if (window == null) {
+			window = new Window();
+		}
+		return window;
 	}
 
 	public void init(int width, int height, String title) {

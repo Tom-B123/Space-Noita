@@ -2,6 +2,7 @@ package org.example.Physics;
 
 import org.example.Object.TextureGenerator;
 import org.example.Object.Transform;
+import org.example.Object.Object;
 import org.lwjgl.BufferUtils;
 
 import java.nio.IntBuffer;
@@ -15,12 +16,6 @@ public class World {
 
 	private TextureGenerator texture_generator = null;
 
-	private Transform temp_transform;
-	private short[] temp_image;
-
-	private int width;
-	private int height;
-
 	private double world_width = 0;
 	private double world_height = 0;
 
@@ -30,8 +25,6 @@ public class World {
 	}
 
 	public void init(long glfw_window) {
-		this.width = 32;
-		this.height = 16;
 		this.scale = 4d;
 
 		this.glfw_window = glfw_window;
@@ -39,42 +32,32 @@ public class World {
 		update_window_dims();
 
 		this.texture_generator = TextureGenerator.get();
-		this.temp_transform = new Transform(0,0,0);
-		temp_image = new short[width * height];
-		for (int y = 0; y < height; y++) {
-			for (int x = 0; x < width; x++) {
-				set_pixel(x,y,x,0,y,1);
-			}
+		this.objects = new Object[] {
+				new Object(new Transform(-1,0,0),30,50),
+				new Object(new Transform(0,0,0),30,50),
+				new Object(new Transform(1,0,0),30,50),
+		};
+	}
+
+
+	public void update(float dt) {
+		update_window_dims();
+		for (Object object : this.objects) {
+			//object.rotate(0.01f);
 		}
 	}
 
-	private void set_pixel(int x, int y, int r, int g, int b,int a) {
-		int index = (x + y * this.width);
-		short colour = (short)(a + (b << 1) + (g << 6) + (r << 11));
-		this.temp_image[index] = colour;
-	}
-
-
 	public void draw() {
-		this.texture_generator.draw(world_width,world_height,this.scale,width,height,this.temp_transform,temp_image);
+		for (Object object : this.objects) {
+			this.texture_generator.draw(world_width,world_height,this.scale,object.get_width(),object.get_height(),object.get_transform(),object.data);
+		}
 	}
 
 	private void update_window_dims() {
 		IntBuffer w = BufferUtils.createIntBuffer(1);
 		IntBuffer h = BufferUtils.createIntBuffer(1);
 		glfwGetWindowSize(this.glfw_window, w, h);
-		this.world_width = (double)w.get(0);
-		this.world_height = (double)h.get(0);
-	}
-
-	public void update(float dt) {
-		//this.temp_transform.x += dt * 4;
-
-		this.temp_transform.angle += 0.01d;
-
-		this.scale += 0.1d;
-
-		update_window_dims();
-
+		this.world_width = w.get(0);
+		this.world_height = h.get(0);
 	}
 }
