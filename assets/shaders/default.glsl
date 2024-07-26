@@ -37,10 +37,10 @@ void main()
     f_colour = a_colour;
     f_tex_coords = a_tex_coords;
 
-    float n_angle = get_angle(a_pos.x - u_rotation.y, a_pos.y - u_rotation.z);
-    float n_distance = get_distance(a_pos.x - u_rotation.y, a_pos.y - u_rotation.z);
+    float n_angle = get_angle(u_transform.x + a_pos.x - u_rotation.y, u_transform.y + a_pos.y - u_rotation.z);
+    float n_distance = get_distance(u_transform.x + a_pos.x - u_rotation.y, u_transform.y + a_pos.y - u_rotation.z);
 
-    gl_Position = u_projection * u_view * vec4(u_transform.xy + u_scale.x * u_scale.yz * a_pos.xy,0.0, 1.0);
+    gl_Position = u_projection * u_view * u_scale.x * vec4(u_transform.xy + u_scale.yz * vec2(n_distance * cos(n_angle), n_distance * sin(n_angle)),0.0, 1.0);
 }
 
 #type fragment
