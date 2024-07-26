@@ -21,9 +21,9 @@ public class SpriteRenderer extends Component {
 
 
 	private float[] vertex_array = {
-		100f,   0f, 0.0f,       	1.0f, 0.0f, 0.0f, 1.0f,     1, 1, // Bottom right 0
-		0f, 100f, 0.0f,      	 	0.0f, 1.0f, 0.0f, 1.0f,     0, 0, // Top left     1
-		100f, 100f, 0.0f ,      	1.0f, 0.0f, 1.0f, 1.0f,     1, 0, // Top right    2
+		1f,   0f, 0.0f,       		1.0f, 0.0f, 0.0f, 1.0f,     1, 1, // Bottom right 0
+		0f, 1f, 0.0f,      		 	0.0f, 1.0f, 0.0f, 1.0f,     0, 0, // Top left     1
+		1f, 1f, 0.0f ,  	    	1.0f, 0.0f, 1.0f, 1.0f,     1, 0, // Top right    2
 		0f,   0f, 0.0f,       		1.0f, 1.0f, 0.0f, 1.0f,     0, 1  // Bottom left  3
 	};
 
@@ -44,7 +44,6 @@ public class SpriteRenderer extends Component {
 
 	@Override
 	public void init() {
-		System.out.println("inited sprite renderer");
 		vao = glGenVertexArrays();
 		glBindVertexArray(vao);
 
@@ -80,7 +79,7 @@ public class SpriteRenderer extends Component {
 		vertex_array[1] += 10;
 	}
 
-	public void draw(Shader shader, Camera camera) {
+	public void draw(Shader shader, Camera camera, float cell_size) {
 		shader.use();
 
 		shader.upload_texture("TEX_SAMPLER", 0);
@@ -93,6 +92,8 @@ public class SpriteRenderer extends Component {
 		shader.upload_mat4f("u_view",camera.get_view_matrix());
 		shader.upload_float("u_time", Time.get_time());
 		shader.upload_vec2f("u_transform", (float)this.object.get_transform().x, (float)this.object.get_transform().y);
+		shader.upload_vec3f("u_scale", cell_size,(float)this.object.get_width(),(float)this.object.get_height());
+		shader.upload_vec3f("u_rotation", (float)this.object.get_transform().angle,(float)this.object.get_transform().x, (float)this.object.get_transform().y);
 
 		glDrawElements(GL_TRIANGLES,element_array.length,GL_UNSIGNED_INT,0);
 

@@ -28,7 +28,7 @@ public class Object {
 
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {
-				if (y > 16) { set_pixel(x,y,31,16,16,1); }
+				if ((x+y)%2 == 0) { set_pixel(x,y,31,16,16,1); }
 				else { set_pixel(x,y,31,0,0,0);}
 			}
 		}
@@ -45,6 +45,7 @@ public class Object {
 	public Transform get_transform() { return this.transform; }
 
 	public void rotate(float angle) { this.transform.angle += angle; }
+	public void translate(double x, double y) { this.transform.x += x; this.transform.y += y; }
 
 	public <T extends Component> T get_component(Class<T> component_class) {
 		for (Component c : components) {

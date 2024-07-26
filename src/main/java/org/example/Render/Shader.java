@@ -116,15 +116,18 @@ public class Shader {
 		mat4.get(mat_buffer);
 		glUniformMatrix4fv(var_location, false, mat_buffer);
 	}
-	public void upload_vec2f(String var_name, float x, float y) {
-		int var_location = glGetUniformLocation(shader_program_id, var_name);
-		glUniform2f(var_location, x,y);
-	}
-
 	public void upload_float(String var_name, float val) {
 		int var_location = glGetUniformLocation(shader_program_id, var_name);
 		use();
 		glUniform1f(var_location, val);
+	}
+	public void upload_vec2f(String var_name, float x, float y) {
+		int var_location = glGetUniformLocation(shader_program_id, var_name);
+		glUniform2f(var_location, x,y);
+	}
+	public void upload_vec3f(String var_name, float x, float y, float z) {
+		int var_location = glGetUniformLocation(shader_program_id, var_name);
+		glUniform3f(var_location, x,y,z);
 	}
 	public void upload_texture(String var_name, int slot) {
 		int var_location = glGetUniformLocation(shader_program_id, var_name);

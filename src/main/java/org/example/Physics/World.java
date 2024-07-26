@@ -19,7 +19,7 @@ import static org.lwjgl.opengl.GL12.GL_UNSIGNED_SHORT_5_5_5_1;
 // A collection of objects which are all drawn to the screen
 public class World {
 	private Object[] objects;
-	private double scale;
+	private float scale;
 
 	private TextureGenerator texture_generator = null;
 	private Camera camera;
@@ -34,7 +34,7 @@ public class World {
 	}
 
 	public void init(long glfw_window) {
-		this.scale = 4d;
+		this.scale = 4;
 
 		this.glfw_window = glfw_window;
 
@@ -45,11 +45,12 @@ public class World {
 		shader = new Shader("assets/shaders/default.glsl");
 		shader.compile();
 
-		this.objects = new Object[] {
-				new Object(new Transform(0,200,0.3f),30,50),
-				new Object(new Transform(200.0,200,0.6f),30,50),
-				new Object(new Transform(400.0,200,0.9f),30,50),
-		};
+		int count = 30;
+
+		this.objects = new Object[count];
+		for (int i = 0; i < count; i ++) {
+			this.objects[i] = new Object(new Transform(3 * i * i,0,i * 0.3f),i,i);
+		}
 	}
 
 
@@ -57,19 +58,16 @@ public class World {
 		update_window_dims();
 		for (Object object : this.objects) {
 			object.get_component(SpriteRenderer.class).update(dt);
+			object.translate(30 * dt,0);
+			object.rotate(0.2f);
 		}
 	}
 
 	public void draw() {
 		for (Object object : this.objects) {
 			this.texture_generator.generate(object.get_width(),object.get_height(),object.data);
-			object.get_component(SpriteRenderer.class).draw(shader,camera);
+			object.get_component(SpriteRenderer.class).draw(shader,camera,scale);
 		}
-		short[] data = new short[4];
-
-		glReadPixels(960,550,2,2,GL_RGBA,GL_UNSIGNED_SHORT_5_5_5_1,data);
-
-		System.out.println(data[0] + "," + data[1] + "," + data[2] + "," + data[3]);
 	}
 
 	private void update_window_dims() {
