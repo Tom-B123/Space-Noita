@@ -17,7 +17,6 @@ public class TextureGenerator {
 
 	private static TextureGenerator texture_generator = null;
 
-	private Shader shader;
 	private final int vertex_size = 3+2;
 	private float[] vertices = new float[4 * vertex_size];
 
@@ -34,11 +33,9 @@ public class TextureGenerator {
 	}
 
 	private void init() {
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
 		glEnable(GL_TEXTURE_2D);
 
-		glPixelStorei(GL_UNPACK_ALIGNMENT,GL_TRUE);
+		glPixelStorei(GL_UNPACK_ALIGNMENT,2);
 
 		// Set textures to be pixilated rather than blurred
 		glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_CLAMP_TO_EDGE);
@@ -50,8 +47,6 @@ public class TextureGenerator {
 		// Bind texture to slot 0?
 		glBindTexture(GL_TEXTURE_2D,0);
 
-		shader = new Shader("assets/shaders/default.glsl");
-		shader.compile();
 
 		vao = glGenVertexArrays();
 		glBindVertexArray(vao);
@@ -84,6 +79,9 @@ public class TextureGenerator {
 		if (width * height != texture_data.length) {
 			throw new Error("Texture generation error: invalid texture dimensions for array size");
 		}
+
+		//glPixelStorei(GL_UNPACK_ROW_LENGTH,width);
+		//glPixelStorei(GL_UNPACK_IMAGE_HEIGHT,height);
 
 		// Takes height and width in world pixels, applies the transform and draws the texture
 		glTexImage2D(
