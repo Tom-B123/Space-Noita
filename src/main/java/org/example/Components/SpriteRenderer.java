@@ -4,6 +4,7 @@ import org.example.Object.Component;
 import org.example.Render.Camera;
 import org.example.Render.Shader;
 import org.example.Util.Time;
+import org.joml.Vector2f;
 import org.lwjgl.BufferUtils;
 
 import java.nio.FloatBuffer;
@@ -39,25 +40,27 @@ public class SpriteRenderer extends Component {
 
 	private int vao, vbo, ebo;
 
+	private FloatBuffer vertex_buffer;
+
 	@Override
 	public void init() {
 		System.out.println("inited sprite renderer");
 		vao = glGenVertexArrays();
 		glBindVertexArray(vao);
 
-		FloatBuffer vertex_buffer = BufferUtils.createFloatBuffer(vertex_array.length);
+		vertex_buffer = BufferUtils.createFloatBuffer(vertex_array.length);
 		vertex_buffer.put(vertex_array).flip();
 
 		vbo = glGenBuffers();
 		glBindBuffer(GL_ARRAY_BUFFER,vbo);
-		glBufferData(GL_ARRAY_BUFFER,vertex_buffer,GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER,vertex_buffer,GL_DYNAMIC_DRAW);
 
 		IntBuffer element_buffer = BufferUtils.createIntBuffer(element_array.length);
 		element_buffer.put(element_array).flip();
 
 		ebo = glGenBuffers();
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,ebo);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER,element_buffer,GL_STATIC_DRAW);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER,element_buffer,GL_DYNAMIC_DRAW);
 
 		int position_size = 3;
 		int colour_size = 4;
@@ -74,7 +77,7 @@ public class SpriteRenderer extends Component {
 
 	@Override
 	public void update(float dt) {
-
+		vertex_array[1] += 10;
 	}
 
 	public void draw(Shader shader, Camera camera) {
@@ -83,9 +86,13 @@ public class SpriteRenderer extends Component {
 		shader.upload_texture("TEX_SAMPLER", 0);
 		glActiveTexture(GL_TEXTURE0);
 
-		shader.uploadMat4f("u_projection",camera.get_projection_matrix());
-		shader.uploadMat4f("u_view",camera.get_view_matrix());
+		glBindVertexArray(vao);
+		//vertex_buffer.put(vertex_array).flip();
+
+		shader.upload_mat4f("u_projection",camera.get_projection_matrix());
+		shader.upload_mat4f("u_view",camera.get_view_matrix());
 		shader.upload_float("u_time", Time.get_time());
+		shader.upload_vec2f("u_transform", (float)this.object.get_transform().x, (float)this.object.get_transform().y);
 
 		glDrawElements(GL_TRIANGLES,element_array.length,GL_UNSIGNED_INT,0);
 

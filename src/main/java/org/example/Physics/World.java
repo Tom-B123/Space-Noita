@@ -46,9 +46,9 @@ public class World {
 		shader.compile();
 
 		this.objects = new Object[] {
-				new Object(new Transform(-0.5,0,0),30,50),
 				new Object(new Transform(0,0,0),30,50),
-				new Object(new Transform(0.5,0,0),30,50),
+				new Object(new Transform(200.0,0,0),30,50),
+				new Object(new Transform(400.0,0,0),30,50),
 		};
 	}
 
@@ -56,7 +56,7 @@ public class World {
 	public void update(float dt) {
 		update_window_dims();
 		for (Object object : this.objects) {
-			//object.rotate(0.01f);
+			object.get_component(SpriteRenderer.class).update(dt);
 		}
 	}
 

@@ -1,6 +1,7 @@
 package org.example.Render;
 
 import org.joml.Matrix4f;
+import org.joml.Vector2f;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL;
 
@@ -109,11 +110,15 @@ public class Shader {
 		glUseProgram(0);
 	}
 
-	public void uploadMat4f(String var_name, Matrix4f mat4) {
+	public void upload_mat4f(String var_name, Matrix4f mat4) {
 		int var_location = glGetUniformLocation(shader_program_id, var_name);
 		FloatBuffer mat_buffer = BufferUtils.createFloatBuffer(16);
 		mat4.get(mat_buffer);
 		glUniformMatrix4fv(var_location, false, mat_buffer);
+	}
+	public void upload_vec2f(String var_name, float x, float y) {
+		int var_location = glGetUniformLocation(shader_program_id, var_name);
+		glUniform2f(var_location, x,y);
 	}
 
 	public void upload_float(String var_name, float val) {

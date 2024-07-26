@@ -1,34 +1,35 @@
 #type vertex
 #version 330 core
-layout (location=0) in vec3 aPos;
-layout (location=1) in vec4 aColor;
-layout (location=2) in vec2 aTexCoords;
+layout (location=0) in vec3 a_pos;
+layout (location=1) in vec4 a_colour;
+layout (location=2) in vec2 a_tex_coords;
 
-uniform mat4 uProjection;
-uniform mat4 uView;
+uniform mat4 u_projection;
+uniform mat4 u_view;
+uniform vec2 u_transform;
 
-out vec4 fColor;
-out vec2 fTexCoords;
+out vec4 f_colour;
+out vec2 f_tex_coords;
 
 void main()
 {
-    fColor = aColor;
-    fTexCoords = aTexCoords;
-    gl_Position = uProjection * uView * vec4(aPos, 1.0);
+    f_colour = a_colour;
+    f_tex_coords = a_tex_coords;
+    gl_Position = u_projection * u_view * vec4(a_pos.xy + u_transform,0.0, 1.0);
 }
 
 #type fragment
 #version 330 core
 
-uniform float uTime;
+uniform float u_time;
 uniform sampler2D TEX_SAMPLER;
 
-in vec4 fColor;
-in vec2 fTexCoords;
+in vec4 f_colour;
+in vec2 f_tex_coords;
 
 out vec4 color;
 
 void main()
 {
-    color = texture(TEX_SAMPLER, fTexCoords);
+    color = texture(TEX_SAMPLER, f_tex_coords);
 }
