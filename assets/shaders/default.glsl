@@ -24,12 +24,6 @@ float get_distance(float x, float y) {
     return sqrt(x*x + y*y);
 }
 
-float get_angle(float x, float y) {
-    if (x >= 0 && y >= 0)  return atan(y/x);
-    if (x < 0 && y >= 0)   return half_PI + atan(-x/y);
-    if (x < 0 && y < 0)  return PI + atan(y/x);
-    return half_PI + PI + atan(-x/y);
-}
 
 
 void main()
@@ -37,10 +31,8 @@ void main()
     f_colour = a_colour;
     f_tex_coords = a_tex_coords;
 
-    float n_angle = get_angle(((u_transform.x + a_pos.x)) - u_rotation.y, ((u_transform.y + a_pos.y)) - u_rotation.z) + u_rotation.x;
-    float n_distance = get_distance(((u_transform.x + a_pos.x)) - u_rotation.y, ((u_transform.y + a_pos.y)) - u_rotation.z);
 
-    gl_Position = u_projection * u_view * u_scale.x * vec4(u_transform.xy + u_scale.yz * vec2(n_distance * cos(n_angle), n_distance * sin(n_angle)),0.0, 1.0);
+    gl_Position = u_projection * u_view * vec4(u_transform.xy + a_pos.xy,0.0, 1.0);
 }
 
 #type fragment

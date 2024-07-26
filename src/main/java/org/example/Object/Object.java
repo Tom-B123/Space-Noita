@@ -26,6 +26,7 @@ public class Object {
 		add_component(new SpriteRenderer());
 		get_component(SpriteRenderer.class).init();
 
+
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {
 				if ((x+y)%2 == 0) { set_pixel(x,y,31,16,16,1); }
@@ -44,7 +45,11 @@ public class Object {
 	public int get_height() { return this.height; }
 	public Transform get_transform() { return this.transform; }
 
-	public void rotate(float angle) { this.transform.angle += angle; }
+	public void rotate(float angle) {
+		this.transform.angle += angle;
+		this.get_component(SpriteRenderer.class).rotate(angle);
+	}
+	public void scale(float scale_x, float scale_y) { this.get_component(SpriteRenderer.class).scale(scale_x,scale_y); }
 	public void translate(double x, double y) { this.transform.x += x; this.transform.y += y; }
 
 	public <T extends Component> T get_component(Class<T> component_class) {

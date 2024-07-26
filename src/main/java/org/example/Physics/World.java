@@ -45,26 +45,35 @@ public class World {
 		shader = new Shader("assets/shaders/default.glsl");
 		shader.compile();
 
-		int count = 30;
+		int count = 10;
 
 		this.objects = new Object[count];
 		for (int i = 0; i < count; i ++) {
-			this.objects[i] = new Object(new Transform(3 * i * i,0,i * 0.3f),i,i);
+			this.objects[i] = new_object(200 * i,50,i * 0.3f,15,20);
 		}
 	}
 
+	private Object new_object(float x, float y, float angle, int width, int height) {
+		Object object = new Object(new Transform(x,y,angle),width,height);
+		object.get_component(SpriteRenderer.class).scale((float)width, (float)height);
+		object.get_component(SpriteRenderer.class).scale(this.scale,this.scale);
+		object.get_component(SpriteRenderer.class).rotate((float)object.get_transform().angle);
+		return object;
+	}
 
 	public void update(float dt) {
 		update_window_dims();
 		for (Object object : this.objects) {
+			// Consider drawing threads to send and read data to the GPU.
 			object.get_component(SpriteRenderer.class).update(dt);
-			object.translate(30 * dt,0 * dt);
+			//object.translate(30 * dt,0 * dt);
 			object.rotate(0.5f * dt);
 		}
 	}
 
 	public void draw() {
 		for (Object object : this.objects) {
+			// Consider drawing threads to send pixel data to the GPU
 			this.texture_generator.generate(object.get_width(),object.get_height(),object.data);
 			object.get_component(SpriteRenderer.class).draw(shader,camera,scale);
 		}
