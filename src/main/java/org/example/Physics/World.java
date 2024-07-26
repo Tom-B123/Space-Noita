@@ -58,8 +58,8 @@ public class World {
 		update_window_dims();
 		for (Object object : this.objects) {
 			object.get_component(SpriteRenderer.class).update(dt);
-			object.translate(30 * dt,10 * dt);
-			object.rotate(0.2f);
+			object.translate(30 * dt,0 * dt);
+			object.rotate(0.5f * dt);
 		}
 	}
 
