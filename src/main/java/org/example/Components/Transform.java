@@ -1,4 +1,4 @@
-package org.example.Object;
+package org.example.Components;
 
 public class Transform {
 	public double x;

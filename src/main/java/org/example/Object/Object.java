@@ -1,5 +1,10 @@
 package org.example.Object;
 
+import org.example.Components.SpriteRenderer;
+import org.example.Components.Transform;
+
+import java.util.Vector;
+
 // A quad with a procedural texture, which is simulated as both a rigid-body and in
 // The powder sim.
 public class Object {
@@ -8,11 +13,18 @@ public class Object {
 	private int height;
 	public short[] data;
 
+	private Vector<Component> components;
+
 	public Object(Transform transform, int width, int height) {
 		this.transform = transform;
 		this.width = width;
 		this.height = height;
 		this.data = new short[width*height];
+
+		this.components = new Vector<>();
+
+		add_component(new SpriteRenderer());
+		get_component(SpriteRenderer.class).init();
 
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {
@@ -32,4 +44,33 @@ public class Object {
 	public Transform get_transform() { return this.transform; }
 
 	public void rotate(float angle) { this.transform.angle += angle; }
+
+	public <T extends Component> T get_component(Class<T> component_class) {
+		for (Component c : components) {
+			if (component_class.isAssignableFrom(c.getClass())) {
+				try {
+					return component_class.cast(c);
+				} catch(ClassCastException e) {
+					throw new Error("component casting error");
+				}
+			}
+		}
+		return null;
+	}
+
+	public <T extends Component> void remove_component(Class<T> component_class) {
+		for (int i=0; i<components.size(); i++) {
+			Component c = components.get(i);
+			if (component_class.isAssignableFrom((c.getClass()))) {
+				components.remove(i);
+				return;
+			}
+		}
+	}
+
+	public void add_component(Component c) {
+		this.components.add(c);
+		this.get_component(c.getClass()).object = this;
+	}
+
 }

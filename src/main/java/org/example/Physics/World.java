@@ -1,7 +1,8 @@
 package org.example.Physics;
 
+import org.example.Components.SpriteRenderer;
 import org.example.Object.TextureGenerator;
-import org.example.Object.Transform;
+import org.example.Components.Transform;
 import org.example.Object.Object;
 import org.lwjgl.BufferUtils;
 
@@ -49,7 +50,8 @@ public class World {
 
 	public void draw() {
 		for (Object object : this.objects) {
-			this.texture_generator.draw(world_width,world_height,this.scale,object.get_width(),object.get_height(),object.get_transform(),object.data);
+			this.texture_generator.generate(object.get_width(),object.get_height(),object.data);
+			object.get_component(SpriteRenderer.class).draw();
 		}
 	}
 

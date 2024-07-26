@@ -112,6 +112,9 @@ public class Window {
 		// Make the window visible
 		glfwShowWindow(glfw_window);
 		GL.createCapabilities();
+
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_ONE,GL_ONE_MINUS_SRC_ALPHA);
 	}
 
 	public long get_glfw_window() { return glfw_window; }

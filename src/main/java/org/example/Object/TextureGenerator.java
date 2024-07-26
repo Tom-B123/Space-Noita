@@ -1,5 +1,6 @@
 package org.example.Object;
 
+import org.example.Components.Transform;
 import org.example.Render.Shader;
 
 import static java.lang.Math.*;
@@ -59,10 +60,10 @@ public class TextureGenerator {
 		glBindBuffer(GL_ARRAY_BUFFER,vbo);
 		glBufferData(GL_ARRAY_BUFFER, vertices.length * Float.BYTES, GL_DYNAMIC_DRAW);
 
-		int ebo = glGenBuffers();
-		int[] indices = generate_indices();
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER,indices,GL_STATIC_DRAW);
+		//int ebo = glGenBuffers();
+		//int[] indices = generate_indices();
+		//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+		//glBufferData(GL_ELEMENT_ARRAY_BUFFER,indices,GL_STATIC_DRAW);
 
 		glVertexAttribPointer(0,POS_SIZE,GL_FLOAT, false, VERTEX_SIZE * Float.BYTES, POS_OFFSET);
 		glEnableVertexAttribArray(0);
@@ -79,21 +80,10 @@ public class TextureGenerator {
 	}
 
 	// Takes width and height of world (pixels that fit on screen), of the object, the object transform and the texture data
-	public void draw(double world_width, double world_height, double world_scale, int width, int height, Transform transform, short[] texture_data) {
-		shader.use();
-
+	public void generate(int width, int height, short[] texture_data) {
 		if (width * height != texture_data.length) {
 			throw new Error("Texture generation error: invalid texture dimensions for array size");
 		}
-
-		double sprite_width = world_width / width;
-		double sprite_height = world_height / height;
-
-		double small_angle = atan((double)height / (double)width);
-		double big_angle = (PI * 0.5d) - small_angle;
-
-		double rotation = PI + small_angle + (double)transform.angle;
-		double magnitude = sqrt(world_width*world_width + world_height*world_height);
 
 		// Takes height and width in world pixels, applies the transform and draws the texture
 		glTexImage2D(
@@ -107,29 +97,5 @@ public class TextureGenerator {
 				GL_UNSIGNED_SHORT_5_5_5_1,
 				texture_data
 		);
-
-		// Draw the vertices of the quad
-		for (int i = 0; i < 4; i++) {
-			// Vertex locations
-			this.vertices[i * this.vertex_size] = (float)(transform.x / world_scale + (cos(rotation) * height * world_scale/ magnitude));
-			this.vertices[i * this.vertex_size + 1] = (float)(transform.y / world_scale + (sin(rotation) * width * world_scale / magnitude));
-			this.vertices[i * this.vertex_size + 1] = 0.0f;
-
-			// Texture coordinates
-			this.vertices[i * this.vertex_size + 1] = (float)(((i+1)/2)%2);
-			this.vertices[i * this.vertex_size + 1] = (float)(i/2);
-
-			switch (i%2) {
-				case 0:
-					rotation += 2 * big_angle;
-					break;
-				case 1:
-					rotation += 2 * small_angle;
-					break;
-				default:
-					break;
-			}
-		}
-		glEnd();
 	}
 }
