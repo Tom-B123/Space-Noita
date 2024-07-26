@@ -29,7 +29,7 @@ public class Object {
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {
 				if (y > 16) { set_pixel(x,y,31,16,16,1); }
-				else { set_pixel(x,y,0,0,0,0);}
+				else { set_pixel(x,y,31,0,0,0);}
 			}
 		}
 	}

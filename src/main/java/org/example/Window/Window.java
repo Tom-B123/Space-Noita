@@ -53,8 +53,8 @@ public class Window {
 		this.title = title;
 
 		this.r = 0;
-		this.g = 0;
-		this.b = 0;
+		this.g = 0.2f;
+		this.b = 0.2f;
 		this.a = 1;
 
 		GLFWErrorCallback.createPrint(System.err).set();

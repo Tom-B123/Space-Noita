@@ -46,9 +46,9 @@ public class World {
 		shader.compile();
 
 		this.objects = new Object[] {
-				new Object(new Transform(0,0,0),30,50),
-				new Object(new Transform(200.0,0,0),30,50),
-				new Object(new Transform(400.0,0,0),30,50),
+				new Object(new Transform(0,200,0.3f),30,50),
+				new Object(new Transform(200.0,200,0.6f),30,50),
+				new Object(new Transform(400.0,200,0.9f),30,50),
 		};
 	}
 
