@@ -10,6 +10,7 @@ import org.example.Render.Shader;
 import org.joml.Vector2f;
 import org.lwjgl.BufferUtils;
 
+import java.io.IOException;
 import java.nio.IntBuffer;
 
 import static org.lwjgl.glfw.GLFW.glfwGetWindowSize;
@@ -57,6 +58,9 @@ public class World {
 		for (int i = 0; i < count; i ++) {
 			this.objects[i] = new_object(200 * i,200,i * 0.3f,40,100);
 		}
+		try {
+			this.texture_generator.generate("assets/images/default.bmp");
+		} catch (IOException e) {throw new Error("failed to read texture"); }
 	}
 
 	private Object new_object(float x, float y, float angle, int width, int height) {
@@ -82,6 +86,7 @@ public class World {
 		for (Object object : this.objects) {
 			// Consider drawing threads to send pixel data to the GPU
 			this.texture_generator.generate(object.get_width(),object.get_height(),object.data);
+
 			object.get_component(SpriteRenderer.class).draw(shader,camera,scale);
 		}
 	}

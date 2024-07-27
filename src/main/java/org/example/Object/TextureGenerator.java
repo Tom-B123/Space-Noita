@@ -2,6 +2,12 @@ package org.example.Object;
 
 import org.example.Components.Transform;
 import org.example.Render.Shader;
+import org.lwjgl.stb.STBTTBitmap;
+
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.*;
+import java.util.Scanner;
 
 import static java.lang.Math.*;
 import static org.lwjgl.opengl.GL11.*;
@@ -94,5 +100,21 @@ public class TextureGenerator {
 				GL_UNSIGNED_SHORT_5_5_5_1,
 				texture_data
 		);
+	}
+	public void generate(String file_path) throws IOException {
+		System.out.println("Reading from file: " + file_path);
+
+		BufferedImage image = ImageIO.read(new File(file_path));
+		short[] texture_data = new short[image.getWidth() * image.getHeight()];
+		for (int y = 0; y < image.getHeight(); y++) {
+			for (int x = 0; x < image.getWidth(); x++) {
+				int colour = image.getRGB(x,y);
+				boolean alpha = image.getRGB(x,y)>>24 == 0x00;
+				System.out.println(colour + "," + alpha);
+			}
+		}
+
+		System.out.println("Generating texture of length: " + texture_data.length);
+		//this.generate(width,height,texture_data);
 	}
 }
