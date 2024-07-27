@@ -161,7 +161,7 @@ public class ParticleUpdate {
 		step_pointer = Pointer.to(new int[]{step});
 
 		// Point to kernel arguments
-		bind_arguments();
+		//bind_arguments();
 
 		// Add data to the kernel
 		clEnqueueNDRangeKernel(
