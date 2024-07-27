@@ -101,20 +101,31 @@ public class TextureGenerator {
 				texture_data
 		);
 	}
-	public void generate(String file_path) throws IOException {
-		System.out.println("Reading from file: " + file_path);
+	public void generate(String file_path) {
+		try {
+			BufferedImage image = ImageIO.read(new File(file_path));
+			short[] texture_data = new short[image.getWidth() * image.getHeight()];
 
-		BufferedImage image = ImageIO.read(new File(file_path));
-		short[] texture_data = new short[image.getWidth() * image.getHeight()];
-		for (int y = 0; y < image.getHeight(); y++) {
-			for (int x = 0; x < image.getWidth(); x++) {
-				int colour = image.getRGB(x,y);
-				boolean alpha = image.getRGB(x,y)>>24 == 0x00;
-				System.out.println(colour + "," + alpha);
+			int ind = 0;
+
+			for (int y = 0; y < image.getHeight(); y++) {
+				for (int x = 0; x < image.getWidth(); x++) {
+					int colour = image.getRGB(x, y);
+					// Bright green is interpreted as a transparent pixel, any non 255 shade of green is not
+					int a = colour == -16711936 ? 1 : 0;
+
+					// Get the byte long rgb values
+					int r = ((colour >> 16) & 255) / 8;
+					int g = ((colour >> 8) & 255) / 8;
+					int b = ((colour >> 0) & 255) / 8;
+
+					short out = (short) (a + (b << 1) + (g << 6) + (r << 11));
+					System.out.println(x + "," + y + ": [" + r + "," + g + "," + b + "," + a + "]");
+					texture_data[ind] = out;
+					ind++;
+				}
 			}
-		}
-
-		System.out.println("Generating texture of length: " + texture_data.length);
-		//this.generate(width,height,texture_data);
+			this.generate(image.getWidth(), image.getHeight(), texture_data);
+		} catch (IOException e) {throw new Error("failed to read texture: " + file_path); }
 	}
 }

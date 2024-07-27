@@ -55,12 +55,10 @@ public class World {
 		int count = 10;
 
 		this.objects = new Object[count];
-		for (int i = 0; i < count; i ++) {
+		for (int i = 0; i < count-1; i ++) {
 			this.objects[i] = new_object(200 * i,200,i * 0.3f,40,100);
 		}
-		try {
-			this.texture_generator.generate("assets/images/default.bmp");
-		} catch (IOException e) {throw new Error("failed to read texture"); }
+		this.objects[count-1] = new_object(200,400,0,10,10);
 	}
 
 	private Object new_object(float x, float y, float angle, int width, int height) {
@@ -83,11 +81,14 @@ public class World {
 	}
 
 	public void draw() {
+		int ind = 0;
 		for (Object object : this.objects) {
 			// Consider drawing threads to send pixel data to the GPU
 			this.texture_generator.generate(object.get_width(),object.get_height(),object.data);
 
+			if (ind == 9) { this.texture_generator.generate("assets/images/default.bmp"); }
 			object.get_component(SpriteRenderer.class).draw(shader,camera,scale);
+			ind ++;
 		}
 	}
 
