@@ -33,6 +33,10 @@ dependencies {
     testImplementation platform('org.junit:junit-bom:5.10.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'
 }
+dependencies {
+    // https://mvnrepository.com/artifact/org.jocl/jocl
+    implementation group: 'org.jocl', name: 'jocl', version: '2.0.4'
+}
 
 test {
     useJUnitPlatform()

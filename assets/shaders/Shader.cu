@@ -483,7 +483,7 @@ struct PosVel update_velocity(struct PosVel pos_vel, int width, int height, __gl
     return pos_vel;
 }
 
-__kernel void sampleKernel(__global const short *src_pos, __global const short *src_vel, __global short *dst_pos, __global short *dst_vel, __global const int *world_dims, __global int *step_ptr) {
+__kernel void sampleKernel(__global const short *src_pos, __global short *dst_pos,__global const int *world_dims, __global int *step_ptr) {
     int gid = get_global_id(0);
     const int width = world_dims[0];
     const int height = world_dims[1];
@@ -491,61 +491,6 @@ __kernel void sampleKernel(__global const short *src_pos, __global const short *
     int y = (gid) / width;
     int step = step_ptr[0];
 
-
-    // Clear the whole screen to remove junk data
-    if (step == 0) {
-        dst_pos[3 * gid] = 0;
-        dst_pos[3 * gid + 1] = 0;
-        dst_pos[3 * gid + 2] = 0;
-        dst_vel[gid] = 0;
-        return;
-    }
-
-    // Assign the RGB to cell_colour
-    struct Colour cell_colour = get_cell(x,y,width,height,src_pos);
-
-    // Default output value is blank
-    // Mutate the cell_colour in the update step
-    if (!is_empty(x,y,width,height,src_pos)) {
-        short velocity = src_vel[gid];
-		int vel_magnitude = ((velocity & 65280) >> 8);
-		int vel_angle = (velocity & 255);
-
-        struct PosVel pos_vel = {x,y,vel_magnitude,vel_angle};
-
-        int new_index = pos_to_index(x,y,width);
-
-        dst_vel[gid] = 0;
-
-        // Move the cell
-        dst_pos[3 * gid] = 0;
-        dst_pos[3 * gid + 1] = 0;
-        dst_pos[3 * gid + 2] = 0;
-
-        //pos_vel = update_velocity(pos_vel,width,height,src_pos,src_vel,dst_pos);
-
-        if (true || near_static(pos_vel,width,height,src_pos,src_vel)) {
-            // Allow heavier particles to sink in lighter particles
-            if (is_falling(pos_vel.x,pos_vel.y,width,height,src_pos)) { pos_vel = update_weight(pos_vel, width, height, step, src_pos); }
-
-            // Fall and flow due to gravity
-            if (is_powder(pos_vel.x,pos_vel.y,width,height,src_pos)) { pos_vel = update_powder(pos_vel,width,height,src_pos); }
-            if (is_liquid(pos_vel.x,pos_vel.y,width,height,src_pos)) { pos_vel = update_liquid(pos_vel,width,height,step,src_pos); }
-
-            if (pos_vel.x == -1) { return;}
-        }
-
-        velocity = pos_vel.vel_angle + (pos_vel.vel_magnitude << 8);
-
-        new_index = pos_to_index(pos_vel.x,pos_vel.y,width);
-
-        if (new_index == -1) { return; }
-
-
-        dst_pos[new_index]     = cell_colour.r;
-        dst_pos[new_index + 1] = cell_colour.g;
-        dst_pos[new_index + 2] = cell_colour.b;
-        dst_vel[new_index / 3] = velocity;
-
-    }
+    dst_pos[gid] = 2 * (gid % 64) + 1;
+    return;
 };

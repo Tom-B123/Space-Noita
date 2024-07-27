@@ -32,7 +32,7 @@ public class TextureGenerator {
 
 	}
 
-	private void init() {
+	public void init() {
 		glEnable(GL_TEXTURE_2D);
 
 		glPixelStorei(GL_UNPACK_ALIGNMENT,2);
@@ -69,7 +69,6 @@ public class TextureGenerator {
 	public static TextureGenerator get() {
 		if (texture_generator == null) {
 			texture_generator = new TextureGenerator();
-			texture_generator.init();
 		}
 		return texture_generator;
 	}

@@ -1,6 +1,7 @@
 package org.example.Physics;
 
 import org.example.Components.SpriteRenderer;
+import org.example.Object.ParticleUpdate;
 import org.example.Object.TextureGenerator;
 import org.example.Components.Transform;
 import org.example.Object.Object;
@@ -22,6 +23,7 @@ public class World {
 	private float scale;
 
 	private TextureGenerator texture_generator = null;
+	private ParticleUpdate particle_update = null;
 	private Camera camera;
 	private Shader shader;
 
@@ -41,6 +43,10 @@ public class World {
 		update_window_dims();
 
 		this.texture_generator = TextureGenerator.get();
+		this.texture_generator.init();
+		this.particle_update = ParticleUpdate.get();
+		this.particle_update.init();
+
 		this.camera = new Camera(new Vector2f(0.0f,0.0f));
 		shader = new Shader("assets/shaders/default.glsl");
 		shader.compile();
@@ -49,7 +55,7 @@ public class World {
 
 		this.objects = new Object[count];
 		for (int i = 0; i < count; i ++) {
-			this.objects[i] = new_object(200 * i,50,i * 0.3f,15,20);
+			this.objects[i] = new_object(200 * i,200,i * 0.3f,40,100);
 		}
 	}
 
@@ -66,8 +72,9 @@ public class World {
 		for (Object object : this.objects) {
 			// Consider drawing threads to send and read data to the GPU.
 			object.get_component(SpriteRenderer.class).update(dt);
+			object.data = particle_update.update(object.data,object.get_width(),object.get_height());
 			//object.translate(30 * dt,0 * dt);
-			object.rotate(0.5f * dt);
+			//object.rotate(0.5f * dt);
 		}
 	}
 
