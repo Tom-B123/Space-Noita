@@ -74,7 +74,7 @@ public class World {
 			object.get_component(SpriteRenderer.class).update(dt);
 			object.data = particle_update.update(object.data,object.get_width(),object.get_height());
 			//object.translate(30 * dt,0 * dt);
-			//object.rotate(0.5f * dt);
+			object.rotate(0.5f * dt);
 		}
 	}
 

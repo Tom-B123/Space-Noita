@@ -175,6 +175,7 @@ public class ParticleUpdate {
 				n * Sizeof.cl_short, data_pointer, 0, null, null
 		);
 
+		step++;
 
 		return data;
 	}

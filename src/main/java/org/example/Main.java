@@ -22,12 +22,19 @@ public class Main {
         this.world.init(window.get_glfw_window());
     }
 
+    private int step = 0;
+
     private void loop() {
         float dt;
         while (!window.should_close()) {
             this.window.clear();
 
             dt = this.window.update();
+
+            if (step % 10 == 9) { System.out.println(1/dt); }
+            step++;
+
+
 
             this.world.update(dt);
 
