@@ -10,7 +10,7 @@ struct Colour {
 struct Node {
     struct Node *next;
     struct Node *prev;
-    char val;
+    char *val;
 };
 
 struct List {
@@ -24,8 +24,18 @@ struct List push(struct List list, char val) {
         list.root = &n_node;
         list.root -> next = &n_node;
         list.root -> prev = &n_node;
+        list.root -> val = &n_node.val;
     }
+    else {
+
+    }
+    list.length ++;
     return list;
+}
+
+char peep(struct List list) {
+    if (list.root == NULL) { return '0'; }
+    return &list.root -> val;
 }
 
 struct Colour get_pixel_colour(short pixel_data) {
@@ -38,7 +48,8 @@ short get_pixel_data(struct Colour pixel_colour) {
 }
 
 char get_tags(struct Colour pixel_colour) {
-    return "s";
+    char msg[4] = "stop";
+    return msg;
 }
 
 __kernel void sampleKernel(__global const short *src_pos, __global short *dst_pos,__global const int *world_dims, __global int *step_ptr) {
@@ -52,7 +63,12 @@ __kernel void sampleKernel(__global const short *src_pos, __global short *dst_po
 
     struct Colour cell_colour = get_pixel_colour(src_pos[gid]);
 
-    if (step == 0) { printf("tags: \n",get_tags(cell_colour)); }
+    struct List tag_list = {NULL, 0};
+    tag_list = push(tag_list,'s');
+
+    char c = get_tags(cell_colour);
+
+    if (step == 0) { printf("tags: %c \n",c); }
 
     dst_pos[gid] = get_pixel_data(cell_colour);
     return;
