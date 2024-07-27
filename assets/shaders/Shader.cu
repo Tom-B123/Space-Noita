@@ -7,6 +7,27 @@ struct Colour {
     bool a;
 };
 
+struct Node {
+    struct Node *next;
+    struct Node *prev;
+    char val;
+};
+
+struct List {
+    struct Node *root;
+    int length;
+};
+
+struct List push(struct List list, char val) {
+    struct Node n_node = { NULL, NULL, val };
+    if (list.root == NULL) {
+        list.root = &n_node;
+        list.root -> next = &n_node;
+        list.root -> prev = &n_node;
+    }
+    return list;
+}
+
 struct Colour get_pixel_colour(short pixel_data) {
     struct Colour out = {(char)(pixel_data & 63488) >> 11, (char)(pixel_data & 1984) >> 6, (char)(pixel_data & 62) >> 1, (bool)(pixel_data & 1) };
     return out;
@@ -14,6 +35,10 @@ struct Colour get_pixel_colour(short pixel_data) {
 short get_pixel_data(struct Colour pixel_colour) {
     short out = (short)(pixel_colour.a + (pixel_colour.b << 1) + (pixel_colour.g << 6) + (pixel_colour.r << 11));
     return out;
+}
+
+char get_tags(struct Colour pixel_colour) {
+    return "s";
 }
 
 __kernel void sampleKernel(__global const short *src_pos, __global short *dst_pos,__global const int *world_dims, __global int *step_ptr) {
@@ -24,11 +49,10 @@ __kernel void sampleKernel(__global const short *src_pos, __global short *dst_po
     int y = (gid) / width;
     int step = step_ptr[0];
 
+
     struct Colour cell_colour = get_pixel_colour(src_pos[gid]);
 
-    //cell_colour.r = (cell_colour.r - 1 + x + step / 20) % 32;
-    //cell_colour.g = (cell_colour.b + 2 + y + step / 20) % 32;
-    //cell_colour.a = !cell_colour.a;
+    if (step == 0) { printf("tags: \n",get_tags(cell_colour)); }
 
     dst_pos[gid] = get_pixel_data(cell_colour);
     return;

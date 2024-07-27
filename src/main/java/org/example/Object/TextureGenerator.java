@@ -120,7 +120,6 @@ public class TextureGenerator {
 					int b = ((colour >> 0) & 255) / 8;
 
 					short out = (short) (a + (b << 1) + (g << 6) + (r << 11));
-					System.out.println(x + "," + y + ": [" + r + "," + g + "," + b + "," + a + "]");
 					texture_data[ind] = out;
 					ind++;
 				}
