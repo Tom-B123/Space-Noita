@@ -112,7 +112,7 @@ public class TextureGenerator {
 				for (int x = 0; x < image.getWidth(); x++) {
 					int colour = image.getRGB(x, y);
 					// Bright green is interpreted as a transparent pixel, any non 255 shade of green is not
-					int a = colour == -16711936 ? 1 : 0;
+					int a = colour == -16711936 ? 0 : 1;
 
 					// Get the byte long rgb values
 					int r = ((colour >> 16) & 255) / 8;
