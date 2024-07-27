@@ -26,9 +26,9 @@ __kernel void sampleKernel(__global const short *src_pos, __global short *dst_po
 
     struct Colour cell_colour = get_pixel_colour(src_pos[gid]);
 
-    cell_colour.r = (cell_colour.r - 1 + x + step / 20) % 32;
-    cell_colour.g = (cell_colour.b + 2 + y + step / 20) % 32;
-    cell_colour.a = !cell_colour.a;
+    //cell_colour.r = (cell_colour.r - 1 + x + step / 20) % 32;
+    //cell_colour.g = (cell_colour.b + 2 + y + step / 20) % 32;
+    //cell_colour.a = !cell_colour.a;
 
     dst_pos[gid] = get_pixel_data(cell_colour);
     return;

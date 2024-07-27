@@ -38,40 +38,16 @@ public class ParticleUpdate {
 	}
 
 	// Assign the mem_object buffers and bind them to the kernel arguments
-	private void bind_arguments() {
+	private void bind_argument(int object, Pointer source) {
 		// RGB5_1A source
-		mem_objects[0] = clCreateBuffer(context,
+		mem_objects[object] = clCreateBuffer(context,
 				CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
-				Sizeof.cl_short * n, data_pointer, null
-		);
-		// RGB5_1A destination
-		mem_objects[1] = clCreateBuffer(context,
-				CL_MEM_READ_WRITE,
-				Sizeof.cl_short * n, null, null
-		);
-		//
-		mem_objects[2] = clCreateBuffer(context,
-				CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
-				Sizeof.cl_short * n, dims_pointer, null
-		);
-		// RGB5_1A source
-		mem_objects[3] = clCreateBuffer(context,
-				CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
-				Sizeof.cl_short * n, step_pointer, null
+				Sizeof.cl_short * n, source, null
 		);
 
 		// Bind the kernel's arguments
-		clSetKernelArg(kernel, 0,
-				Sizeof.cl_mem, Pointer.to(mem_objects[0])
-		);
-		clSetKernelArg(kernel, 1,
-				Sizeof.cl_mem, Pointer.to(mem_objects[1])
-		);
-		clSetKernelArg(kernel, 2,
-				Sizeof.cl_mem, Pointer.to(mem_objects[2])
-		);
-		clSetKernelArg(kernel, 3,
-				Sizeof.cl_mem, Pointer.to(mem_objects[3])
+		clSetKernelArg(kernel, object,
+				Sizeof.cl_mem, Pointer.to(mem_objects[object])
 		);
 	}
 
@@ -142,7 +118,15 @@ public class ParticleUpdate {
 		dims_pointer = Pointer.to(new int[]{0});
 		step_pointer = Pointer.to(new int[]{0});
 
-		bind_arguments();
+		mem_objects[1] = clCreateBuffer(
+				context, CL_MEM_READ_WRITE,
+				Sizeof.cl_short * 100 * 100, null, null
+		);
+		clSetKernelArg(kernel,1,Sizeof.cl_mem,Pointer.to(mem_objects[1]));
+
+		bind_argument(0,data_pointer);
+		bind_argument(2,dims_pointer);
+		bind_argument(3,step_pointer);
 
 		local_work_size = new long[]{1};
 	}
@@ -160,8 +144,11 @@ public class ParticleUpdate {
 		dims_pointer = Pointer.to(new int[]{width, height});
 		step_pointer = Pointer.to(new int[]{step});
 
+
 		// Point to kernel arguments
-		//bind_arguments();
+		bind_argument(0,data_pointer);
+		bind_argument(2,dims_pointer);
+		bind_argument(3,step_pointer);
 
 		// Add data to the kernel
 		clEnqueueNDRangeKernel(
