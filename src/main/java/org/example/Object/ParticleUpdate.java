@@ -23,6 +23,7 @@ public class ParticleUpdate {
 
 	// Data to be read and written to
 	private Pointer data_pointer;
+	private Pointer gravity_pointer;
 	private Pointer step_pointer;
 	private Pointer dims_pointer;
 
@@ -110,11 +111,12 @@ public class ParticleUpdate {
 		kernel = clCreateKernel(program, "sampleKernel", null);
 
 		// Arguments are: object data source, object data output, window size, simulation step
-		mem_objects = new cl_mem[4];
+		mem_objects = new cl_mem[5];
 
 		n = 1;
 
 		data_pointer = Pointer.to(new int[]{0});
+		gravity_pointer = Pointer.to(new float[]{0.0f});
 		dims_pointer = Pointer.to(new int[]{0});
 		step_pointer = Pointer.to(new int[]{0});
 
@@ -125,8 +127,9 @@ public class ParticleUpdate {
 		clSetKernelArg(kernel,1,Sizeof.cl_mem,Pointer.to(mem_objects[1]));
 
 		bind_argument(0,data_pointer);
-		bind_argument(2,dims_pointer);
-		bind_argument(3,step_pointer);
+		bind_argument(2,gravity_pointer);
+		bind_argument(3,dims_pointer);
+		bind_argument(4,step_pointer);
 
 		local_work_size = new long[]{1};
 	}
@@ -134,21 +137,24 @@ public class ParticleUpdate {
 
 	// Pass in data, dimensions and simulation step to the GPU
 	// Define the global work size (number of pixels)
-	public short[] update(short[] data, int width, int height) {
+	public short[] update(short[] data, int width, int height,float gravity_angle) {
 		// Prepare kernel
 		n = (long)width * (long)height;
 
 		global_work_size = new long[]{n};
 
 		data_pointer = Pointer.to(data);
+		gravity_pointer = Pointer.to(new float[]{gravity_angle});
 		dims_pointer = Pointer.to(new int[]{width, height});
 		step_pointer = Pointer.to(new int[]{step});
 
 
 		// Point to kernel arguments
+
 		bind_argument(0,data_pointer);
-		bind_argument(2,dims_pointer);
-		bind_argument(3,step_pointer);
+		bind_argument(2,gravity_pointer);
+		bind_argument(3,dims_pointer);
+		bind_argument(4,step_pointer);
 
 		// Add data to the kernel
 		clEnqueueNDRangeKernel(

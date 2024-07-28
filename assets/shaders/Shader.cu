@@ -138,13 +138,13 @@ struct Pos update_powder(struct Pos pos, int width, int height, struct Bound *bo
     return pos;
 }
 
-__kernel void sampleKernel(__global const short *src_pos, __global short *dst_pos,__global const int *world_dims, __global int *step_ptr) {
+__kernel void sampleKernel(__global const short *src_pos, __global short *dst_pos, __global const float *src_gravity_angle, __global const int *src_world_dims, __global int *src_step) {
     const int gid = get_global_id(0);
-    const int width = world_dims[0];
-    const int height = world_dims[1];
+    const int width = src_world_dims[0];
+    const int height = src_world_dims[1];
     const int x = (gid) % width;
     const int y = (gid) / width;
-    const int step = step_ptr[0];
+    const int step = src_step[0];
 
     const struct Colour blank = { 0,0,0,0 };
 

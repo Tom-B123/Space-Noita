@@ -73,7 +73,7 @@ public class World {
 		for (Object object : this.objects) {
 			// Consider drawing threads to send and read data to the GPU.
 			object.get_component(SpriteRenderer.class).update(dt);
-			object.data = particle_update.update(object.data,object.get_width(),object.get_height());
+			object.data = particle_update.update(object.data,object.get_width(),object.get_height(),0.0f);
 			//object.translate(30 * dt,0 * dt);
 			object.rotate(0.5f * dt);
 		}
