@@ -32,7 +32,7 @@ public class ParticleUpdate extends Component {
 	private int step = 0;
 
 	private void make_buffer(int object, Pointer source) {
-		//free_buffer(object);
+		free_buffer(object);
 		mem_objects[object] = clCreateBuffer(context,
 				CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
 				Sizeof.cl_short * n, source, null
