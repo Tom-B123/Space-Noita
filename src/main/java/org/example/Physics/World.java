@@ -52,13 +52,12 @@ public class World {
 		shader = new Shader("assets/shaders/default.glsl");
 		shader.compile();
 
-		int count = 1;
+		int count = 10;
 
 		this.objects = new Object[count];
-		for (int i = 0; i < count-1; i ++) {
+		for (int i = 0; i < count; i ++) {
 			this.objects[i] = new_object(200 * i,200,i * 0.3f,40,100);
 		}
-		this.objects[count-1] = new_object(200,400,0,10,10);
 	}
 
 	private Object new_object(float x, float y, float angle, int width, int height) {

@@ -5,6 +5,8 @@ import org.example.Components.Transform;
 
 import java.util.Vector;
 
+import static java.lang.Math.random;
+
 // A quad with a procedural texture, which is simulated as both a rigid-body and in
 // The powder sim.
 public class Object {
@@ -29,7 +31,7 @@ public class Object {
 
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {
-				if ((x+y)%2 == 0) { set_pixel(x,y,31,31,31,1); }
+				if (random() < 0.5f) { set_pixel(x,y,31,31,0,1); }
 				else { set_pixel(x,y,0,0,0,0);}
 			}
 		}
