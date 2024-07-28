@@ -80,6 +80,9 @@ struct Tag get_tags(struct Colour pixel_colour, struct Bound *bounds) {
         case 0:
             // Sand
             out_tag.is_powder = true;
+        case 1:
+            // Water
+            out_tag.is_liquid = true;
         default:
             break;
     }
@@ -117,6 +120,9 @@ int falling_cell_priority(struct Pos pos, int width, float gravity_angle, struct
 
         if (is_falling(pos,width,bounds,src_pos)) { return i;}
 
+        pos.x += offset_x[gravity_direction];
+        pos.y += offset_y[gravity_direction];
+
         // Move gravity_direction to the next cell
         gravity_direction += i * (2 * (i%2) - 1);
     }
@@ -145,6 +151,44 @@ struct Pos update_powder(struct Pos pos, int width, int height, float gravity_an
         pos.y += offset_y[gravity_direction];
 
         if (is_empty(pos,width,height,src_pos) && falling_cell_priority(pos,width,gravity_angle,bounds,src_pos) >= i) { return pos;}
+
+        pos.x -= offset_x[gravity_direction];
+        pos.y -= offset_y[gravity_direction];
+
+        // Move gravity_direction to the next cell
+        gravity_direction += i * (2 * (i%2) - 1);
+    }
+
+    pos.x = initial_x;
+    pos.y = initial_y;
+
+    return pos;
+}
+
+struct Pos update_liquid(struct Pos pos, int width, int height, float gravity_angle, struct Bound *bounds, __global const short *src_pos) {
+
+    int initial_x = pos.x;
+    int initial_y = pos.y;
+
+    int gravity_direction = get_gravity_direction(gravity_angle);
+
+    int offset_x[] = {
+         0,  1,  1,  1,  0, -1, -1, -1,
+    };
+
+    int offset_y[] = {
+        -1, -1,  0,  1,  1,  1,  0, -1,
+    };
+
+    for (int i = 0; i < 5; i++) {
+        // Look at cell moving into the position
+        pos.x += offset_x[gravity_direction];
+        pos.y += offset_y[gravity_direction];
+
+        if (is_empty(pos,width,height,src_pos) && falling_cell_priority(pos,width,gravity_angle,bounds,src_pos) >= i) { return pos;}
+
+        pos.x -= offset_x[gravity_direction];
+        pos.y -= offset_y[gravity_direction];
 
         // Move gravity_direction to the next cell
         gravity_direction += i * (2 * (i%2) - 1);
@@ -180,6 +224,7 @@ __kernel void sampleKernel(__global const short *src_pos, __global short *dst_po
     struct Tag tag = get_tags(cell_colour,&bounds);
 
     if (tag.is_powder) { pos = update_powder(pos,width,height,gravity_angle,&bounds,src_pos); }
+    if (tag.is_liquid) { pos = update_liquid(pos,width,height,gravity_angle,&bounds,src_pos); }
 
     int n_id = pos_to_index(pos,width);
 

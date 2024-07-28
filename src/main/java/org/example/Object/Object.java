@@ -31,7 +31,7 @@ public class Object {
 
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {
-				if (random() < 0.5f) { set_pixel(x,y,31,31,0,1); }
+				if ((x+y)%2 == 0) { set_pixel(x,y,(int)(29 + random()*3),(int)(29 + random()*3),0,1); }
 				else { set_pixel(x,y,0,0,0,0);}
 			}
 		}
