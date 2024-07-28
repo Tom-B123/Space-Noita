@@ -38,14 +38,16 @@ public class ParticleUpdate {
 		return particle_update;
 	}
 
-	// Assign the mem_object buffers and bind them to the kernel arguments
-	private void bind_argument(int object, Pointer source) {
-		// RGB5_1A source
+	private void make_buffer(int object, Pointer source) {
 		mem_objects[object] = clCreateBuffer(context,
 				CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
 				Sizeof.cl_short * n, source, null
 		);
+	}
 
+	// Assign the mem_object buffers and bind them to the kernel arguments
+	private void bind_argument(int object) {
+		// RGB5_1A source
 		// Bind the kernel's arguments
 		clSetKernelArg(kernel, object,
 				Sizeof.cl_mem, Pointer.to(mem_objects[object])
@@ -124,12 +126,18 @@ public class ParticleUpdate {
 				context, CL_MEM_READ_WRITE,
 				Sizeof.cl_short * 100 * 100, null, null
 		);
-		clSetKernelArg(kernel,1,Sizeof.cl_mem,Pointer.to(mem_objects[1]));
 
-		bind_argument(0,data_pointer);
-		bind_argument(2,gravity_pointer);
-		bind_argument(3,dims_pointer);
-		bind_argument(4,step_pointer);
+		make_buffer(0,data_pointer);
+		make_buffer(2,gravity_pointer);
+		make_buffer(3,dims_pointer);
+		make_buffer(4,step_pointer);
+
+		bind_argument(0);
+		bind_argument(1);
+		bind_argument(2);
+		bind_argument(3);
+		bind_argument(4);
+
 
 		local_work_size = new long[]{1};
 	}
@@ -151,12 +159,16 @@ public class ParticleUpdate {
 
 		// Point to kernel arguments
 
-		bind_argument(0,data_pointer);
-		bind_argument(2,gravity_pointer);
-		bind_argument(3,dims_pointer);
-		bind_argument(4,step_pointer);
+		//make_buffer(0,data_pointer);
+		//make_buffer(2,gravity_pointer);
+		//make_buffer(3,dims_pointer);
+		//make_buffer(4,step_pointer);
 
-		if (true) {return data;}
+		bind_argument(0);
+		bind_argument(2);
+		bind_argument(3);
+		bind_argument(4);
+
 		// Add data to the kernel
 		clEnqueueNDRangeKernel(
 				command_queue,kernel,1,null,
