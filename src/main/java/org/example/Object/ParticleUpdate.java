@@ -39,6 +39,7 @@ public class ParticleUpdate {
 	}
 
 	private void make_buffer(int object, Pointer source) {
+		//free_buffer(object);
 		mem_objects[object] = clCreateBuffer(context,
 				CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
 				Sizeof.cl_short * n, source, null
@@ -52,6 +53,12 @@ public class ParticleUpdate {
 		clSetKernelArg(kernel, object,
 				Sizeof.cl_mem, Pointer.to(mem_objects[object])
 		);
+	}
+
+	private void free_buffer(int object) {
+		if (mem_objects[object] == null) { return; }
+
+		clReleaseMemObject(mem_objects[object]);
 	}
 
 	public void init() {
@@ -122,6 +129,7 @@ public class ParticleUpdate {
 		dims_pointer = Pointer.to(new int[]{0});
 		step_pointer = Pointer.to(new int[]{0});
 
+		// Bad to have constant sized read buffer
 		mem_objects[1] = clCreateBuffer(
 				context, CL_MEM_READ_WRITE,
 				Sizeof.cl_short * 100 * 100, null, null
@@ -138,7 +146,6 @@ public class ParticleUpdate {
 		bind_argument(3);
 		bind_argument(4);
 
-
 		local_work_size = new long[]{1};
 	}
 
@@ -151,23 +158,6 @@ public class ParticleUpdate {
 
 		global_work_size = new long[]{n};
 
-		data_pointer = Pointer.to(data);
-		gravity_pointer = Pointer.to(new float[]{gravity_angle});
-		dims_pointer = Pointer.to(new int[]{width, height});
-		step_pointer = Pointer.to(new int[]{step});
-
-
-		// Point to kernel arguments
-
-		//make_buffer(0,data_pointer);
-		//make_buffer(2,gravity_pointer);
-		//make_buffer(3,dims_pointer);
-		//make_buffer(4,step_pointer);
-
-		bind_argument(0);
-		bind_argument(2);
-		bind_argument(3);
-		bind_argument(4);
 
 		// Add data to the kernel
 		clEnqueueNDRangeKernel(
@@ -180,6 +170,24 @@ public class ParticleUpdate {
 				command_queue,mem_objects[1],CL_TRUE,0,
 				n * Sizeof.cl_short, data_pointer, 0, null, null
 		);
+
+		data_pointer = Pointer.to(data);
+		gravity_pointer = Pointer.to(new float[]{gravity_angle});
+		dims_pointer = Pointer.to(new int[]{width, height});
+		step_pointer = Pointer.to(new int[]{step});
+
+
+		// Point to kernel arguments
+
+		make_buffer(0,data_pointer);
+		make_buffer(2,gravity_pointer);
+		make_buffer(3,dims_pointer);
+		make_buffer(4,step_pointer);
+
+		bind_argument(0);
+		bind_argument(2);
+		bind_argument(3);
+		bind_argument(4);
 
 		step++;
 
