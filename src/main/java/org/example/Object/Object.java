@@ -29,8 +29,8 @@ public class Object {
 
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {
-				if ((x+y)%2 == 0) { set_pixel(x,y,31,31,0,1); }
-				else { set_pixel(x,y,31,0,0,0);}
+				if ((x+y)%2 == 0) { set_pixel(x,y,31,31,31,1); }
+				else { set_pixel(x,y,0,0,0,0);}
 			}
 		}
 	}

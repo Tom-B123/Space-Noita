@@ -52,7 +52,7 @@ public class World {
 		shader = new Shader("assets/shaders/default.glsl");
 		shader.compile();
 
-		int count = 10;
+		int count = 1;
 
 		this.objects = new Object[count];
 		for (int i = 0; i < count-1; i ++) {
@@ -86,7 +86,7 @@ public class World {
 			// Consider drawing threads to send pixel data to the GPU
 			this.texture_generator.generate(object.get_width(),object.get_height(),object.data);
 
-			if (ind == 9) { this.texture_generator.generate("assets/images/default.bmp"); }
+			//if (ind == 0) { this.texture_generator.generate("assets/images/default.bmp"); }
 			object.get_component(SpriteRenderer.class).draw(shader,camera,scale);
 			ind ++;
 		}

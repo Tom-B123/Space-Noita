@@ -1,9 +1,9 @@
 // Holds RGB colour data for a pixel
 struct Colour {
     // Stores the colour in a more readable format, chars used as channels must be between 0 and 31
-    char r;
-    char g;
-    char b;
+    short r;
+    short g;
+    short b;
     bool a;
 };
 
@@ -29,7 +29,12 @@ struct Bound {
 };
 
 struct Colour get_pixel_colour(short pixel_data) {
-    struct Colour out = {(char)(pixel_data & 63488) >> 11, (char)(pixel_data & 1984) >> 6, (char)(pixel_data & 62) >> 1, (bool)(pixel_data & 1) };
+    int i_pixel_data = (int)pixel_data;
+    struct Colour out = {(short)(i_pixel_data & 63488) >> 11, (short)(i_pixel_data & 1984) >> 6, (short)(i_pixel_data & 62) >> 1, (bool)(pixel_data & 1) };
+
+    if (out.r < 0) { out.r += 32; }
+
+    printf("[%i,%i,%i] ",out.r,out.g,out.b);
     return out;
 }
 short get_pixel_data(struct Colour pixel_colour) {
@@ -39,7 +44,7 @@ short get_pixel_data(struct Colour pixel_colour) {
 
 int get_material_id(struct Colour pixel_colour, struct Bound *bounds) {
     for (int i = 0; i < 2; i++) {
-        if (pixel_colour.r > 0) printf("min: %i, max: %i, pixel: %i \n",bounds[i].min_r,bounds[i].max_r,pixel_colour.r);
+        //if (pixel_colour.r > 0) printf("min: %i, max: %i, pixel: %i \n",bounds[i].min_r,bounds[i].max_r,pixel_colour.r);
         if (
             pixel_colour.r >= bounds[i].min_r && pixel_colour.r <= bounds[i].max_r &&
             pixel_colour.g >= bounds[i].min_g && pixel_colour.g <= bounds[i].max_g &&
@@ -78,9 +83,14 @@ __kernel void sampleKernel(__global const short *src_pos, __global short *dst_po
         {0,0,0,2,29,31,1},   // Water (ID 1)
     };
 
-    if (cell_colour.r == 0)printf("%i,%i,%i \n",cell_colour.r,cell_colour.g,cell_colour.b);
+    //printf("%i,%i,%i \n",cell_colour.r,cell_colour.g,cell_colour.b);
 
-    struct Tag tag = get_tags(cell_colour,&bounds);
+    if (cell_colour.r == 31 && cell_colour.g == 31) { printf("sand!");}
+
+    //cell_colour.r = (x + step) % 32;
+    //cell_colour.g = (y + step) % 32;
+
+    //struct Tag tag = get_tags(cell_colour,&bounds);
 
     dst_pos[gid] = get_pixel_data(cell_colour);
     return;
