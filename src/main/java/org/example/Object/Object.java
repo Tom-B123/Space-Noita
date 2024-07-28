@@ -1,5 +1,6 @@
 package org.example.Object;
 
+import org.example.Components.ParticleUpdate;
 import org.example.Components.SpriteRenderer;
 import org.example.Components.Transform;
 
@@ -35,6 +36,9 @@ public class Object {
 				else { set_pixel(x,y,0,0,0,0);}
 			}
 		}
+
+		add_component(new ParticleUpdate());
+		get_component(ParticleUpdate.class).init();
 	}
 
 	private void set_pixel(int x, int y, int r, int g, int b,int a) {

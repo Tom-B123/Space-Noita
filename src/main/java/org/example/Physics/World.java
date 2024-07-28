@@ -1,7 +1,7 @@
 package org.example.Physics;
 
 import org.example.Components.SpriteRenderer;
-import org.example.Object.ParticleUpdate;
+import org.example.Components.ParticleUpdate;
 import org.example.Object.TextureGenerator;
 import org.example.Components.Transform;
 import org.example.Object.Object;
@@ -10,14 +10,11 @@ import org.example.Render.Shader;
 import org.joml.Vector2f;
 import org.lwjgl.BufferUtils;
 
-import java.io.IOException;
 import java.nio.IntBuffer;
 
 import static java.lang.Math.PI;
 import static org.lwjgl.glfw.GLFW.glfwGetWindowSize;
-import static org.lwjgl.opengl.GL11.GL_RGBA;
 import static org.lwjgl.opengl.GL11.glReadPixels;
-import static org.lwjgl.opengl.GL12.GL_UNSIGNED_SHORT_5_5_5_1;
 
 // A collection of objects which are all drawn to the screen
 public class World {
@@ -25,7 +22,6 @@ public class World {
 	private float scale;
 
 	private TextureGenerator texture_generator = null;
-	private ParticleUpdate particle_update = null;
 	private Camera camera;
 	private Shader shader;
 
@@ -46,8 +42,6 @@ public class World {
 
 		this.texture_generator = TextureGenerator.get();
 		this.texture_generator.init();
-		this.particle_update = ParticleUpdate.get();
-		this.particle_update.init();
 
 		this.camera = new Camera(new Vector2f(0.0f,0.0f));
 		shader = new Shader("assets/shaders/default.glsl");
@@ -74,7 +68,7 @@ public class World {
 		for (Object object : this.objects) {
 			// Consider drawing threads to send and read data to the GPU.
 			object.get_component(SpriteRenderer.class).update(dt);
-			object.data = particle_update.update(object.data,object.get_width(),object.get_height(),(float)object.get_transform().angle + (float)PI);
+			object.get_component(ParticleUpdate.class).update(dt);
 			//object.translate(30 * dt,0 * dt);
 			object.rotate(0.1f * dt);
 		}

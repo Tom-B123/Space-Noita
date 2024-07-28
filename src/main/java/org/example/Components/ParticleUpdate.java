@@ -1,14 +1,16 @@
-package org.example.Object;
+package org.example.Components;
 
+import org.example.Object.Component;
 import org.jocl.*;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
+import static java.lang.Math.PI;
 import static org.jocl.CL.*;
 
-public class ParticleUpdate {
+public class ParticleUpdate extends Component {
 
 	private static String program_source;
 
@@ -28,15 +30,6 @@ public class ParticleUpdate {
 	private Pointer dims_pointer;
 
 	private int step = 0;
-
-	private int[] step_array;
-
-	private static ParticleUpdate particle_update = null;
-
-	public static ParticleUpdate get() {
-		if (particle_update == null) { particle_update = new ParticleUpdate(); }
-		return particle_update;
-	}
 
 	private void make_buffer(int object, Pointer source) {
 		//free_buffer(object);
@@ -62,6 +55,8 @@ public class ParticleUpdate {
 	}
 
 	public void init() {
+		this.n = (long)this.object.get_width() * this.object.get_height();
+
 		// Get the shader source code
 		String filepath = "assets/Shaders/shader.cu";
 
@@ -72,9 +67,6 @@ public class ParticleUpdate {
 		} catch(IOException e) {
 			throw new Error("The shader file: " + filepath + " could not be opened");
 		}
-
-		// Universal step across every object's update
-		step_array = new int[] {step};
 
 		final int platform_index = 0;
 		final long device_type = CL_DEVICE_TYPE_ALL;
@@ -122,17 +114,15 @@ public class ParticleUpdate {
 		// Arguments are: object data source, object data output, window size, simulation step
 		mem_objects = new cl_mem[5];
 
-		n = 1;
-
-		data_pointer = Pointer.to(new int[]{0});
-		gravity_pointer = Pointer.to(new float[]{0.0f});
-		dims_pointer = Pointer.to(new int[]{0});
-		step_pointer = Pointer.to(new int[]{0});
+		data_pointer = Pointer.to(this.object.data);
+		gravity_pointer = Pointer.to(new float[]{ (float)this.object.get_transform().angle + (float)PI});
+		dims_pointer = Pointer.to(new int[]{this.object.get_width(),this.object.get_height()});
+		step_pointer = Pointer.to(new int[]{step});
 
 		// Bad to have constant sized read buffer
 		mem_objects[1] = clCreateBuffer(
 				context, CL_MEM_READ_WRITE,
-				Sizeof.cl_short * 100 * 100, null, null
+				Sizeof.cl_short * n, null, null
 		);
 
 		make_buffer(0,data_pointer);
@@ -146,18 +136,18 @@ public class ParticleUpdate {
 		bind_argument(3);
 		bind_argument(4);
 
+		global_work_size = new long[]{n};
 		local_work_size = new long[]{1};
 	}
 
 
 	// Pass in data, dimensions and simulation step to the GPU
 	// Define the global work size (number of pixels)
-	public short[] update(short[] data, int width, int height,float gravity_angle) {
+	@Override
+	public void update(float dt) {
+
+
 		// Prepare kernel
-		n = (long)width * (long)height;
-
-		global_work_size = new long[]{n};
-
 
 		// Add data to the kernel
 		clEnqueueNDRangeKernel(
@@ -171,9 +161,9 @@ public class ParticleUpdate {
 				n * Sizeof.cl_short, data_pointer, 0, null, null
 		);
 
-		data_pointer = Pointer.to(data);
-		gravity_pointer = Pointer.to(new float[]{gravity_angle});
-		dims_pointer = Pointer.to(new int[]{width, height});
+		data_pointer = Pointer.to(this.object.data);
+		gravity_pointer = Pointer.to(new float[]{ (float)this.object.get_transform().angle + (float)PI});
+		dims_pointer = Pointer.to(new int[]{this.object.get_width(), this.object.get_height()});
 		step_pointer = Pointer.to(new int[]{step});
 
 
@@ -190,7 +180,5 @@ public class ParticleUpdate {
 		bind_argument(4);
 
 		step++;
-
-		return data;
 	}
 }

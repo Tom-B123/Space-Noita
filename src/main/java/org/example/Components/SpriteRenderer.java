@@ -53,7 +53,6 @@ public class SpriteRenderer extends Component {
 	private int uv_size;
 	private int vertex_size_bytes;
 
-	@Override
 	public void init() {
 		vao = glGenVertexArrays();
 		glBindVertexArray(vao);

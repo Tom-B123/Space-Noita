@@ -34,8 +34,6 @@ public class Main {
             if (step % 10 == 9) { System.out.println(1/dt); }
             step++;
 
-
-
             this.world.update(dt);
 
             this.world.draw();
