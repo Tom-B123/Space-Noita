@@ -33,8 +33,16 @@ struct Pos {
     int y;
 };
 
+float PI() { return 3.141592654f; }
+float half_PI() { return 1.570796327f; }
+
 int pos_to_index(struct Pos pos, int width) {
     return (pos.x+pos.y*width);
+}
+
+int get_gravity_direction(float src_gravity_angle) {
+    int direction = (int)floor(8 * src_gravity_angle / 2 / PI() + 0.5f);
+    return direction % 8;
 }
 
 struct Colour get_pixel_colour(short pixel_data) {
@@ -83,58 +91,68 @@ bool is_falling(struct Pos pos, int width, struct Bound *bounds, __global const 
     return tag.is_powder || tag.is_liquid;
 }
 
-bool is_empty(struct Pos pos, int width, __global const short *src_pos) {
+bool is_empty(struct Pos pos, int width, int height, __global const short *src_pos) {
     struct Colour cell_colour = get_pixel_colour(src_pos[pos_to_index(pos,width)]);
-    if (pos.x < 0 || pos.x > width - 1 || pos.y < 0) { return false; }
+    if (pos.x < 0 || pos.x > width - 1 || pos.y < 0 || pos.y > height - 1) { return false; }
     return !cell_colour.a;
 }
 
-int falling_cell_priority(struct Pos pos, int width, struct Bound *bounds, __global const short *src_pos) {
+int falling_cell_priority(struct Pos pos, int width, float gravity_angle, struct Bound *bounds, __global const short *src_pos) {
+
+    int gravity_direction = get_gravity_direction(gravity_angle);
+
+    int offset_x[] = {
+         0,  1,  1,  1,  0, -1, -1, -1,
+    };
+
+    int offset_y[] = {
+        -1, -1,  0,  1,  1,  1,  0, -1,
+    };
 
     // Cell falling from above
-    pos.y += 1;
-    if (is_falling(pos,width,bounds,src_pos))           { return 0;}
+    for (int i = 0; i < 5; i++) {
+        // Look at cell moving into the position
+        pos.x -= offset_x[gravity_direction];
+        pos.y -= offset_y[gravity_direction];
 
-    // Cell falling from right
-    pos.x -= 1;
-    if (is_falling(pos,width,bounds,src_pos))           { return 1;}
+        if (is_falling(pos,width,bounds,src_pos)) { return i;}
 
-    // Cell falling from left
-    pos.x+=2;
-    if (is_falling(pos,width,bounds,src_pos))           { return 2;}
-
-    // Cell flowing from right
-    pos.y -= 1;
-    pos.x -= 1;
-    if (is_falling(pos,width,bounds,src_pos))           { return 3;}
-
-    // Cell flowing from left
-    pos.x += 2;
-    if (is_falling(pos,width,bounds,src_pos))           { return 4;}
+        // Move gravity_direction to the next cell
+        gravity_direction += i * (2 * (i%2) - 1);
+    }
 
     return 4;
 }
 
-struct Pos update_powder(struct Pos pos, int width, int height, struct Bound *bounds, __global const short *src_pos) {
-    // Check beneath
-    pos.y -= 1;
-    if (is_empty(pos,width,src_pos)) {
-        return pos;
+struct Pos update_powder(struct Pos pos, int width, int height, float gravity_angle, struct Bound *bounds, __global const short *src_pos) {
+
+    int initial_x = pos.x;
+    int initial_y = pos.y;
+
+    int gravity_direction = get_gravity_direction(gravity_angle);
+
+    int offset_x[] = {
+         0,  1,  1,  1,  0, -1, -1, -1,
+    };
+
+    int offset_y[] = {
+        -1, -1,  0,  1,  1,  1,  0, -1,
+    };
+
+    for (int i = 0; i < 3; i++) {
+        // Look at cell moving into the position
+        pos.x += offset_x[gravity_direction];
+        pos.y += offset_y[gravity_direction];
+
+        if (is_empty(pos,width,height,src_pos) && falling_cell_priority(pos,width,gravity_angle,bounds,src_pos) >= i) { return pos;}
+
+        // Move gravity_direction to the next cell
+        gravity_direction += i * (2 * (i%2) - 1);
     }
 
-    // Check right
-    pos.x += 1;
-    if (is_empty(pos,width,src_pos) && falling_cell_priority(pos,width,bounds,src_pos) >= 1) {
-        return pos;
-    }
+    pos.x = initial_x;
+    pos.y = initial_y;
 
-    // Check left
-    pos.x -= 2;
-    if (is_empty(pos,width,src_pos) && falling_cell_priority(pos,width,bounds,src_pos) >= 1) {
-        return pos;
-    }
-    pos.x += 1;
-    pos.y += 1;
     return pos;
 }
 
@@ -145,6 +163,7 @@ __kernel void sampleKernel(__global const short *src_pos, __global short *dst_po
     const int x = (gid) % width;
     const int y = (gid) / width;
     const int step = src_step[0];
+    const float gravity_angle = src_gravity_angle[0];
 
     const struct Colour blank = { 0,0,0,0 };
 
@@ -160,7 +179,7 @@ __kernel void sampleKernel(__global const short *src_pos, __global short *dst_po
 
     struct Tag tag = get_tags(cell_colour,&bounds);
 
-    if (tag.is_powder) { pos = update_powder(pos,width,height,&bounds,src_pos); }
+    if (tag.is_powder) { pos = update_powder(pos,width,height,gravity_angle,&bounds,src_pos); }
 
     int n_id = pos_to_index(pos,width);
 

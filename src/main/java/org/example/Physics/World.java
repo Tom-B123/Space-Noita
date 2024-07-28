@@ -13,6 +13,7 @@ import org.lwjgl.BufferUtils;
 import java.io.IOException;
 import java.nio.IntBuffer;
 
+import static java.lang.Math.PI;
 import static org.lwjgl.glfw.GLFW.glfwGetWindowSize;
 import static org.lwjgl.opengl.GL11.GL_RGBA;
 import static org.lwjgl.opengl.GL11.glReadPixels;
@@ -73,9 +74,9 @@ public class World {
 		for (Object object : this.objects) {
 			// Consider drawing threads to send and read data to the GPU.
 			object.get_component(SpriteRenderer.class).update(dt);
-			object.data = particle_update.update(object.data,object.get_width(),object.get_height(),0.0f);
+			object.data = particle_update.update(object.data,object.get_width(),object.get_height(),(float)object.get_transform().angle + (float)PI);
 			//object.translate(30 * dt,0 * dt);
-			object.rotate(0.5f * dt);
+			object.rotate(0.1f * dt);
 		}
 	}
 
