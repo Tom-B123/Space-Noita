@@ -30,21 +30,15 @@ public class Object {
 		get_component(SpriteRenderer.class).init();
 
 
-		for (int y = 0; y < height; y++) {
-			for (int x = 0; x < width; x++) {
-				if (random() < 0.5) { set_pixel(x,y,0,0,31,1); }
-				else if (random() < 0.5){ set_pixel(x,y,31,31,0,1);}
-			}
-		}
-
 		add_component(new ParticleUpdate());
 		get_component(ParticleUpdate.class).init();
 	}
 
-	private void set_pixel(int x, int y, int r, int g, int b,int a) {
+	public void set_pixel(int x, int y, int r, int g, int b,int a) {
 		int index = (x + y * this.width);
 		short colour = (short)(a + (b << 1) + (g << 6) + (r << 11));
 		this.data[index] = colour;
+		this.get_component(ParticleUpdate.class).refresh_pixels();
 	}
 
 	public int get_width() { return this.width; }

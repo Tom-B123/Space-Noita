@@ -142,6 +142,11 @@ public class ParticleUpdate extends Component {
 		local_work_size = new long[]{1};
 	}
 
+	public void refresh_pixels() {
+		data_pointer = Pointer.to(this.object.data);
+		make_buffer(0,data_pointer);
+		bind_argument(0);
+	}
 
 	// Pass in data, dimensions and simulation step to the GPU
 	// Define the global work size (number of pixels)
