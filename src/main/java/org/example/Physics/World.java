@@ -47,11 +47,11 @@ public class World {
 		shader = new Shader("assets/shaders/default.glsl");
 		shader.compile();
 
-		int count = 10;
+		int count = 1;
 
 		this.objects = new Object[count];
 		for (int i = 0; i < count; i ++) {
-			this.objects[i] = new_object(200 * i,200,i * 0.3f,40,1000);
+			this.objects[i] = new_object(500,500,0,50,50);
 		}
 	}
 
@@ -70,7 +70,7 @@ public class World {
 			object.get_component(SpriteRenderer.class).update(dt);
 			object.get_component(ParticleUpdate.class).update(dt);
 			//object.translate(30 * dt,0 * dt);
-			object.rotate(0.1f * dt);
+			object.rotate(0.5f * dt);
 		}
 	}
 
