@@ -156,6 +156,7 @@ public class ParticleUpdate {
 		bind_argument(3,dims_pointer);
 		bind_argument(4,step_pointer);
 
+		if (true) {return data;}
 		// Add data to the kernel
 		clEnqueueNDRangeKernel(
 				command_queue,kernel,1,null,

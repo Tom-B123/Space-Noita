@@ -152,9 +152,6 @@ struct Pos update_powder(struct Pos pos, int width, int height, float gravity_an
 
         if (is_empty(pos,width,height,src_pos) && falling_cell_priority(pos,width,gravity_angle,bounds,src_pos) >= i) { return pos;}
 
-        pos.x -= offset_x[gravity_direction];
-        pos.y -= offset_y[gravity_direction];
-
         // Move gravity_direction to the next cell
         gravity_direction += i * (2 * (i%2) - 1);
     }
@@ -186,9 +183,6 @@ struct Pos update_liquid(struct Pos pos, int width, int height, float gravity_an
         pos.y += offset_y[gravity_direction];
 
         if (is_empty(pos,width,height,src_pos) && falling_cell_priority(pos,width,gravity_angle,bounds,src_pos) >= i) { return pos;}
-
-        pos.x -= offset_x[gravity_direction];
-        pos.y -= offset_y[gravity_direction];
 
         // Move gravity_direction to the next cell
         gravity_direction += i * (2 * (i%2) - 1);
