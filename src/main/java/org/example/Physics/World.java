@@ -51,7 +51,7 @@ public class World {
 
 		this.objects = new Object[count];
 		for (int i = 0; i < count; i ++) {
-			this.objects[i] = new_object(200 * i,200,i * 0.3f,40,100);
+			this.objects[i] = new_object(200 * i,200,i * 0.3f,40,1000);
 		}
 	}
 

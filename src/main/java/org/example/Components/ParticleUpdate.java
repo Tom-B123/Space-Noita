@@ -57,6 +57,8 @@ public class ParticleUpdate extends Component {
 	public void init() {
 		this.n = (long)this.object.get_width() * this.object.get_height();
 
+		System.out.println("N has size: " + n + " (" + object.get_width() + "x" + object.get_height() +")");
+
 		// Get the shader source code
 		String filepath = "assets/Shaders/shader.cu";
 
