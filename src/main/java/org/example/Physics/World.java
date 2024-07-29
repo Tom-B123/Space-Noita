@@ -37,7 +37,6 @@ public class World {
 	public void init(long glfw_window) {
 		this.scale = 4;
 
-		// TODO: plans for character and ships, planning common space materials, adding metal and static objects
 
 		this.glfw_window = glfw_window;
 
@@ -50,10 +49,12 @@ public class World {
 		shader = new Shader("assets/shaders/default.glsl");
 		shader.compile();
 
-		int count = 1;
+		int count = 10;
 
 		this.objects = new Object[count];
-		this.objects[0] = new_object(500,500,(float)PI,50,50);
+		for (int i = 0; i < count; i++) {
+			this.objects[i] = new_object(100*i,500,(float)PI,50,50);
+		}
 	}
 
 	private Object new_object(float x, float y, float angle, int width, int height) {
