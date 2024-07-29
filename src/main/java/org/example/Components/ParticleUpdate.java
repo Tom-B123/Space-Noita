@@ -17,6 +17,7 @@ public class ParticleUpdate extends Component {
 	private cl_context context;
 	private cl_command_queue command_queue;
 	private cl_kernel kernel;
+	private cl_program program;
 	private long[] global_work_size;
 	private long[] local_work_size;
 	private cl_mem[] mem_objects;
@@ -103,7 +104,7 @@ public class ParticleUpdate extends Component {
 		command_queue = clCreateCommandQueue(context,device,0,null);
 
 		// Create the program
-		cl_program program = clCreateProgramWithSource(context,
+		program = clCreateProgramWithSource(context,
 				1, new String[] {program_source}, null, null
 		);
 
@@ -138,7 +139,7 @@ public class ParticleUpdate extends Component {
 		bind_argument(3);
 		bind_argument(4);
 
-		global_work_size = new long[]{n * Sizeof.cl_short};
+		global_work_size = new long[]{n};
 		local_work_size = new long[]{1};
 	}
 
@@ -168,6 +169,19 @@ public class ParticleUpdate extends Component {
 				n * Sizeof.cl_short, data_pointer, 0, null, null
 		);
 
+
+
+		// Create the program
+		//cl_program program = clCreateProgramWithSource(context,
+				//1, new String[] {program_source}, null, null
+		//);
+
+		// Build program
+		//clBuildProgram(program,0,null,null,null,null);
+
+		// Create the kernel
+		kernel = clCreateKernel(program, "sampleKernel", null);
+
 		data_pointer = Pointer.to(this.object.data);
 		gravity_pointer = Pointer.to(new float[]{ (float)this.object.get_transform().angle + (float)PI});
 		dims_pointer = Pointer.to(new int[]{this.object.get_width(), this.object.get_height()});
@@ -177,11 +191,19 @@ public class ParticleUpdate extends Component {
 		// Point to kernel arguments
 
 		make_buffer(0,data_pointer);
+
+
+		mem_objects[1] = clCreateBuffer(
+				context, CL_MEM_READ_WRITE,
+				Sizeof.cl_short * n, null, null
+		);
+
 		make_buffer(2,gravity_pointer);
 		make_buffer(3,dims_pointer);
 		make_buffer(4,step_pointer);
 
 		bind_argument(0);
+		bind_argument(1);
 		bind_argument(2);
 		bind_argument(3);
 		bind_argument(4);
