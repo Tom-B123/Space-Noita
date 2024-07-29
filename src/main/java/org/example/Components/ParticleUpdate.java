@@ -138,7 +138,7 @@ public class ParticleUpdate extends Component {
 		bind_argument(3);
 		bind_argument(4);
 
-		global_work_size = new long[]{n};
+		global_work_size = new long[]{n * Sizeof.cl_short};
 		local_work_size = new long[]{1};
 	}
 
