@@ -13,6 +13,7 @@ import org.lwjgl.BufferUtils;
 import java.nio.IntBuffer;
 
 import static java.lang.Math.PI;
+import static java.lang.Math.random;
 import static org.lwjgl.glfw.GLFW.glfwGetWindowSize;
 import static org.lwjgl.opengl.GL11.glReadPixels;
 
@@ -36,6 +37,8 @@ public class World {
 	public void init(long glfw_window) {
 		this.scale = 4;
 
+		// TODO: plans for character and ships, planning common space materials, adding metal and static objects
+
 		this.glfw_window = glfw_window;
 
 		update_window_dims();
@@ -50,7 +53,7 @@ public class World {
 		int count = 1;
 
 		this.objects = new Object[count];
-		this.objects[0] = new_object(500,500,63.0f * (float)PI / 32.0f,50,50);
+		this.objects[0] = new_object(500,500,0,50,50);
 	}
 
 	private Object new_object(float x, float y, float angle, int width, int height) {
@@ -64,12 +67,13 @@ public class World {
 	public void update(float dt) {
 		update_window_dims();
 		for (Object object : this.objects) {
-			object.set_pixel(0,0,31,31,0,1);
+			if (random() < 0.2) object.set_pixel(object.get_width()/2,object.get_height() / 2,31,31,0,1);
+			//if (random() < 0.2) object.set_pixel(object.get_width()/2,object.get_height() / 2,0,0,31,1);
 			// Consider drawing threads to send and read data to the GPU.
 			object.get_component(SpriteRenderer.class).update(dt);
 			object.get_component(ParticleUpdate.class).update(dt);
 			//object.translate(30 * dt,0 * dt);
-			//object.rotate(0.5f * dt);
+			//object.rotate(-0.1f * dt);
 		}
 	}
 

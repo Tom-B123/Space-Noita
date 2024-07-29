@@ -97,9 +97,11 @@ struct Tag get_tags(struct Colour pixel_colour, struct Bound *bounds) {
         case 0:
             // Sand
             out_tag.is_powder = true;
+            break;
         case 1:
             // Water
             out_tag.is_liquid = true;
+            break;
         default:
             break;
     }
@@ -141,7 +143,8 @@ int falling_cell_priority(struct Pos pos, int width, float gravity_angle, int st
         pos.y += offset_y[gravity_direction];
 
         // Move gravity_direction to the next cell
-        gravity_direction += i * (2 * (i%2) - 1);
+        gravity_direction = gravity_direction + ((i+1) * (2 * ((i+1)%2) - 1))%8;
+        if (gravity_direction < 0) {gravity_direction += 8;}
     }
 
     return 4;
@@ -169,8 +172,12 @@ struct Pos update_powder(struct Pos pos, int width, int height, float gravity_an
 
         if (is_empty(pos,width,height,src_pos) && falling_cell_priority(pos,width,gravity_angle,step,bounds,src_pos) >= i) { return pos;}
 
+        pos.x -= offset_x[gravity_direction];
+        pos.y -= offset_y[gravity_direction];
+
         // Move gravity_direction to the next cell
-        gravity_direction += i * (2 * (i%2) - 1);
+        gravity_direction = gravity_direction + ((i+1) * (2 * ((i+1)%2) - 1));
+        if (gravity_direction < 0) {gravity_direction += 8;}
     }
 
     pos.x = initial_x;
@@ -201,8 +208,12 @@ struct Pos update_liquid(struct Pos pos, int width, int height, float gravity_an
 
         if (is_empty(pos,width,height,src_pos) && falling_cell_priority(pos,width,gravity_angle,step,bounds,src_pos) >= i) { return pos;}
 
+        pos.x -= offset_x[gravity_direction];
+        pos.y -= offset_y[gravity_direction];
+
         // Move gravity_direction to the next cell
-        gravity_direction += i * (2 * (i%2) - 1);
+        gravity_direction = gravity_direction + ((i+1) * (2 * ((i+1)%2) - 1));
+        if (gravity_direction < 0) {gravity_direction += 8;}
     }
 
     pos.x = initial_x;
@@ -228,8 +239,8 @@ __kernel void sampleKernel(__global const short *src_pos, __global short *dst_po
 
     // Materials should have a range, eg. 2 in rgb. These colours correspond to unique colours, e.g. metal can be white / red etc.
     struct Bound bounds[] = {
-        {29,31,29,31,0,0,0}, // Sand (ID 0)
-        {0,0,0,2,29,31,1},   // Water (ID 1)
+        {29,31,29,31, 0, 2, 0}, // Sand (ID 0)
+        { 0, 2, 0, 2,29,31, 1},   // Water (ID 1)
     };
 
     struct Tag tag = get_tags(cell_colour,&bounds);
