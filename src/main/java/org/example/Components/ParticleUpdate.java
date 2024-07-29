@@ -171,16 +171,6 @@ public class ParticleUpdate extends Component {
 
 
 
-		// Create the program
-		//cl_program program = clCreateProgramWithSource(context,
-				//1, new String[] {program_source}, null, null
-		//);
-
-		// Build program
-		//clBuildProgram(program,0,null,null,null,null);
-
-		// Create the kernel
-		kernel = clCreateKernel(program, "sampleKernel", null);
 
 		data_pointer = Pointer.to(this.object.data);
 		gravity_pointer = Pointer.to(new float[]{ (float)this.object.get_transform().angle + (float)PI});
@@ -191,13 +181,6 @@ public class ParticleUpdate extends Component {
 		// Point to kernel arguments
 
 		make_buffer(0,data_pointer);
-
-
-		mem_objects[1] = clCreateBuffer(
-				context, CL_MEM_READ_WRITE,
-				Sizeof.cl_short * n, null, null
-		);
-
 		make_buffer(2,gravity_pointer);
 		make_buffer(3,dims_pointer);
 		make_buffer(4,step_pointer);
