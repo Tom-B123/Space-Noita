@@ -115,7 +115,7 @@ struct Tag get_tags(struct Colour pixel_colour, struct Bound *bounds) {
 
 bool is_falling(struct Pos pos, int width, struct Bound *bounds, __global const short *src_pos) {
     struct Tag tag = get_tags(get_pixel_colour(src_pos[pos_to_index(pos,width)]),bounds);
-    return tag.is_powder || tag.is_liquid;
+    return tag.is_powder || tag.is_liquid || tag.is_gas;
 }
 
 bool is_empty(struct Pos pos, int width, int height, __global const short *src_pos) {
