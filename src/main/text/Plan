@@ -1,0 +1,11 @@
+Overall plan for game structure.
+
+Centred around respawning.
+Oil is needed to fire weapons, power machines and buy new things.
+Each death costs some oil to recover, including allied deaths.
+
+Game loop = collect more and more oil on larger and larger scales until forced to run out.
+
+Oil can be lost by reviving units, or can be stolen.
+
+Temporary items and permanent gear can be bought with oil.

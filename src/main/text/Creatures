@@ -1,0 +1,13 @@
+Sprite based creatures including the player
+
+- Main player character
+- Allied characters
+- Neutral / pacifist characters
+- Hostile characters who attack everyone
+- Enemy characters who only attack the player's alignment
+- Creatures require specific gasses to be present, or gear that allows them to breath.
+- Creatures can be maimed and have bionic implants for a lower cost than revival
+- Injuries can prevent gear being used, e.g. broken arm prevents shooting a rifle
+
+-> Respawn for an oil cost, can choose not to do so
+-> Allies can be bought / earned through bonus objectives

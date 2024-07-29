@@ -1,0 +1,6 @@
+Projectiles from weapons
+
+- Ship - scale weapons will hit anything for massive damage.
+- Person scale weapons will avoid friendly fire, aside from negative status effects like fire
+- Projectiles are their own entities and will interact differently with different materials on contact
+- Bullets ricochet off slanted metal, energy weapons melt metal, explosives turn metal into shrapnel.

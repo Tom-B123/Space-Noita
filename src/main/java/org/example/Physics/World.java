@@ -53,7 +53,7 @@ public class World {
 		int count = 1;
 
 		this.objects = new Object[count];
-		this.objects[0] = new_object(500,500,0,50,50);
+		this.objects[0] = new_object(500,500,(float)PI,50,50);
 	}
 
 	private Object new_object(float x, float y, float angle, int width, int height) {
@@ -67,14 +67,14 @@ public class World {
 	public void update(float dt) {
 		update_window_dims();
 		for (Object object : this.objects) {
-			if (random() < 0.2) object.set_pixel(object.get_width()/2,object.get_height() / 2,31,31,0,1);
-			if (random() < 0.2) object.set_pixel(object.get_width()/2,object.get_height() / 2,0,0,31,1);
-			if (random() < 0.2) object.set_pixel(object.get_width()/2,object.get_height() / 2,31,31,31,1);
+			if (random() < 0.4) object.set_pixel(object.get_width()/2,object.get_height() -1,31,31,0,1);
+			if (random() < 0.4) object.set_pixel(object.get_width()/2,object.get_height() -1,0,0,31,1);
+			if (random() < 0.4) object.set_pixel(object.get_width()/2,0,31,31,31,1);
 			// Consider drawing threads to send and read data to the GPU.
 			object.get_component(SpriteRenderer.class).update(dt);
 			object.get_component(ParticleUpdate.class).update(dt);
 			//object.translate(30 * dt,0 * dt);
-			object.rotate(-0.1f * dt);
+			object.rotate(-0.7f * dt);
 		}
 	}
 

@@ -126,6 +126,10 @@ bool is_empty(struct Pos pos, int width, int height, __global const short *src_p
 
 int falling_cell_priority(struct Pos pos, int width, float gravity_angle, int step, struct Bound *bounds, __global const short *src_pos) {
 
+    // If we are a gas, move upwards instead
+    struct Tag tags = get_tags(get_pixel_colour(src_pos[pos_to_index(pos,width)]),bounds);
+    if (tags.is_gas) { gravity_angle += PI(); }
+
     int gravity_direction = get_gravity_direction(gravity_angle,step);
 
     int offset_x[] = {
@@ -159,6 +163,9 @@ struct Pos update_particle(struct Pos pos, int width, int height, float gravity_
 
     int initial_x = pos.x;
     int initial_y = pos.y;
+
+    struct Tag tags = get_tags(get_pixel_colour(src_pos[pos_to_index(pos,width)]),bounds);
+    if (tags.is_gas) { gravity_angle += PI(); }
 
     int gravity_direction = get_gravity_direction(gravity_angle,step);
 
@@ -200,7 +207,7 @@ struct Pos update_liquid(struct Pos pos, int width, int height, float gravity_an
     return update_particle(pos,width,height,gravity_angle,5,step,bounds,src_pos);
 }
 struct Pos update_gas(struct Pos pos, int width, int height, float gravity_angle, int step, struct Bound *bounds, __global const short *src_pos) {
-    return update_particle(pos,width,height,gravity_angle + PI(),5,step,bounds,src_pos);
+    return update_particle(pos,width,height,gravity_angle,5,step,bounds,src_pos);
 }
 
 __kernel void sampleKernel(__global const short *src_pos, __global short *dst_pos, __global const float *src_gravity_angle, __global const int *src_world_dims, __global int *src_step) {

@@ -1,0 +1,10 @@
+Items that can be bought with a limited use:
+
+-Explosives
+-Healing items
+-Buffs
+-Debuffs
+
+-> Can be given to units to assist
+-> May have affects when enemies / friendlies die, e.g. releasing all held buffs / explosives
+-> Can't be scavenged on death
