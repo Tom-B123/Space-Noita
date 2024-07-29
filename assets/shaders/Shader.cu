@@ -42,7 +42,8 @@ int pos_to_index(struct Pos pos, int width) {
 
 int get_gravity_direction(float src_gravity_angle,int step) {
     // Split 8 directions into n more "pseudo directions"
-    const int increments = 8;
+    // High n = obvious alternation, low n = low degree of extra directions
+    const int increments = 4;
 
     // Step of the simulation within these increments
     int sub_step = step % increments;
