@@ -145,9 +145,16 @@ public class Graph {
 				add_edge(world.objects.size()-1,i,other_ind);
 			}
 		}
+
+		int tries = 0;
+		do { tries ++; }
+		while (this.update() > 10.0f && tries < 20);
 	}
 
-	public void update(float dt) {
+	public float update() {
+
+		float movement = 0;
+
 		Node src_node;
 		Node dst_node;
 
@@ -166,15 +173,19 @@ public class Graph {
 
 			if (distance < min_distance) {
 
-				ox = ((-dst_node.x + src_node.x) / distance) * (min_distance - distance) * pull_power * dt;
-				oy = ((-dst_node.y + src_node.y) / distance) * (min_distance - distance) * pull_power * dt;
+				ox = ((-dst_node.x + src_node.x) / distance) * (min_distance - distance) * pull_power;
+				oy = ((-dst_node.y + src_node.y) / distance) * (min_distance - distance) * pull_power;
+
+				movement += abs(ox) + abs(oy);
 
 				translate_node(edge.src, ox, oy, 0.0f);
 			}
 			if (distance > max_distance) {
 
-				ox = ((dst_node.x - src_node.x) / distance) * (distance - max_distance) * pull_power * dt;
-				oy = ((dst_node.y - src_node.y) / distance) * (distance - max_distance) * pull_power * dt;
+				ox = ((dst_node.x - src_node.x) / distance) * (distance - max_distance) * pull_power;
+				oy = ((dst_node.y - src_node.y) / distance) * (distance - max_distance) * pull_power;
+
+				movement += abs(ox) + abs(oy);
 
 				translate_node(edge.src,ox ,oy, 0.0f);
 			}
@@ -188,8 +199,10 @@ public class Graph {
 
 				if (distance < min_distance) {
 
-					ox = ((-dst_node.x + src_node.x) / distance) * (min_distance - distance) * pull_power * dt;
-					oy = ((-dst_node.y + src_node.y) / distance) * (min_distance - distance) * pull_power * dt;
+					ox = ((-dst_node.x + src_node.x) / distance) * (min_distance - distance) * pull_power;
+					oy = ((-dst_node.y + src_node.y) / distance) * (min_distance - distance) * pull_power;
+
+					movement += abs(ox) + abs(oy);
 
 					translate_node(i,ox ,oy, 0.0f);
 				}
@@ -199,5 +212,6 @@ public class Graph {
 		for (Edge edge : this.edges) {
 			update_edge(edge.id,edge.src,edge.dst);
 		}
+		return movement;
 	}
 }

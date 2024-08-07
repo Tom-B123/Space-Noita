@@ -54,6 +54,11 @@ public class World {
 		graph = new Graph(25,3,1920,1080);
 		graph.init(this,scale,50.0f,100.0f);
 
+		this.texture_generator.generate(objects.get(0).get_width(),objects.get(0).get_height(),objects.get(0).data);
+		for (Object object : this.objects) {
+			// Consider drawing threads to send and read data to the GPU.
+			object.get_component(SpriteRenderer.class).update(0);
+		}
 	}
 
 	public void new_object(float x, float y, float angle, int width, int height) {
@@ -67,18 +72,12 @@ public class World {
 
 	public void update(float dt) {
 		update_window_dims();
-		for (Object object : this.objects) {
-			// Consider drawing threads to send and read data to the GPU.
-			graph.update(dt);
-			object.get_component(SpriteRenderer.class).update(dt);
-		}
 	}
 
 	public void draw() {
 		int ind = 0;
 		for (Object object : this.objects) {
 			// Consider drawing threads to send pixel data to the GPU
-			this.texture_generator.generate(object.get_width(),object.get_height(),object.data);
 
 			//if (ind == 0) { this.texture_generator.generate("assets/images/default.bmp"); }
 			object.get_component(SpriteRenderer.class).draw(shader,camera,scale);
