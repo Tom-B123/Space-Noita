@@ -87,16 +87,32 @@ public class Graph {
 	private void update_edge(int edge_index, int src, int dst) {
 		Node src_node = this.nodes.get(src);
 		Node dst_node = this.nodes.get(dst);
+
+		float distance = (float)get_distance(src_node.x,src_node.y,dst_node.x,dst_node.y);
+		float angle = (float)(get_angle(src_node.x,src_node.y,dst_node.x,dst_node.y));
+
+		float centre_x = (src_node.x + dst_node.x) / 2;
+		float centre_y = (src_node.y + dst_node.y) / 2;
+
 		Object object = world.objects.get(edge_index);
-		object.translate(0.01f,0.0);
-		//object.rotate(angle);
+
+		float dx = (float)-object.get_transform().x + centre_x;
+		float dy = (float)-object.get_transform().y + centre_y;
+		float dangle = (float)-object.get_transform().angle + angle;
+
+		object.translate(dx,dy);
+		object.rotate(dangle);
 	}
 
-	public void init(World world,float cell_size) {
+	public void init(World world,float cell_size,float min_distance, float max_distance) {
 		this.world = world;
+
+		this.min_distance = min_distance;
+		this.max_distance = max_distance;
 
 		int x;
 		int y;
+
 		for (int i = 0; i < node_count; i++) {
 			x = random_int(0,width);
 			y = random_int(0,height);
@@ -132,8 +148,15 @@ public class Graph {
 		Node dst_node;
 
 		for (Edge edge : this.edges) {
-			translate_node(edge.src,0.01f,0.0f,0.0f);
+			src_node = this.nodes.get(edge.src);
+			dst_node = this.nodes.get(edge.dst);
 
+			if (get_distance(src_node.x,src_node.y,dst_node.x,dst_node.y) < min_distance) {
+				translate_node(edge.src,0.01f ,0.0f, 0.0f);
+			}
+
+		}
+		for (Edge edge : this.edges) {
 			update_edge(edge.id,edge.src,edge.dst);
 		}
 	}
