@@ -43,6 +43,7 @@ public class Graph {
 	int edge_count;
 
 	World world;
+	float cell_size;
 
 	Vector<Node> nodes = new Vector<>();
 	Vector<Edge> edges = new Vector<>();
@@ -99,13 +100,19 @@ public class Graph {
 		float dx = (float)-object.get_transform().x + centre_x;
 		float dy = (float)-object.get_transform().y + centre_y;
 		float dangle = (float)-object.get_transform().angle + angle;
+		float dscale = (float)(distance / this.cell_size) / object.scale_x;
 
 		object.translate(dx,dy);
 		object.rotate(dangle);
+		float temp_angle = (float)object.get_transform().angle;
+		object.rotate(-temp_angle);
+		object.scale(dscale,1.0f);
+		object.rotate(temp_angle);
 	}
 
 	public void init(World world,float cell_size,float min_distance, float max_distance) {
 		this.world = world;
+		this.cell_size = cell_size;
 
 		this.min_distance = min_distance;
 		this.max_distance = max_distance;

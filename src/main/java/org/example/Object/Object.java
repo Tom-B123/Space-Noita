@@ -16,12 +16,19 @@ public class Object {
 	private int height;
 	public short[] data;
 
+	public float scale_x = 1.0f;
+	public float scale_y = 1.0f;
+
 	private Vector<Component> components;
 
 	public Object(Transform transform, int width, int height) {
 		this.transform = transform;
 		this.width = width;
 		this.height = height;
+
+		this.scale_x *= width;
+		this.scale_y *= height;
+
 		this.data = new short[width*height];
 
 		this.components = new Vector<>();
@@ -55,7 +62,11 @@ public class Object {
 		this.transform.angle += angle;
 		this.get_component(SpriteRenderer.class).rotate(angle);
 	}
-	public void scale(float scale_x, float scale_y) { this.get_component(SpriteRenderer.class).scale(scale_x,scale_y); }
+	public void scale(float scale_x, float scale_y) {
+		this.get_component(SpriteRenderer.class).scale(scale_x,scale_y);
+		this.scale_x *= scale_x;
+		this.scale_y *= scale_y;
+	}
 	public void translate(double x, double y) { this.transform.x += x; this.transform.y += y; }
 
 	public <T extends Component> T get_component(Class<T> component_class) {
