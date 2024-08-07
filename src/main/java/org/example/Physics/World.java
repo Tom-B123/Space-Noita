@@ -52,7 +52,7 @@ public class World {
 		shader.compile();
 
 		graph = new Graph(10,3,1920,1080);
-		graph.init(this,scale,100.0f,200.0f);
+		graph.init(this,scale,30.0f,200.0f);
 
 	}
 

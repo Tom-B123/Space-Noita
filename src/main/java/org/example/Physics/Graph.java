@@ -148,18 +148,31 @@ public class Graph {
 	}
 
 	public void update() {
-		int src;
-		int dst;
-
 		Node src_node;
 		Node dst_node;
+
+		float ox;
+		float oy;
+
 
 		for (Edge edge : this.edges) {
 			src_node = this.nodes.get(edge.src);
 			dst_node = this.nodes.get(edge.dst);
 
-			if (get_distance(src_node.x,src_node.y,dst_node.x,dst_node.y) < min_distance) {
-				translate_node(edge.src,0.01f ,0.0f, 0.0f);
+			float distance = (float)get_distance(src_node.x,src_node.y,dst_node.x,dst_node.y);
+			if (distance < min_distance) {
+
+				ox = ((dst_node.x - src_node.x) / distance) * (min_distance - distance);
+				oy = ((dst_node.y - src_node.y) / distance) * (min_distance - distance);
+
+				translate_node(edge.src,ox ,oy, 0.0f);
+			}
+			if (distance > max_distance) {
+
+				ox = ((dst_node.x - src_node.x) / distance) * (distance - max_distance);
+				oy = ((dst_node.y - src_node.y) / distance) * (distance - max_distance);
+
+				translate_node(edge.src,ox ,oy, 0.0f);
 			}
 
 		}
