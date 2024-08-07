@@ -20,7 +20,7 @@ import static org.lwjgl.opengl.GL11.glReadPixels;
 
 // A collection of objects which are all drawn to the screen
 public class World {
-	private Vector<Object> objects = new Vector<>();
+	public Vector<Object> objects = new Vector<>();
 	private float scale;
 
 	private TextureGenerator texture_generator = null;
@@ -52,7 +52,7 @@ public class World {
 		shader.compile();
 
 		graph = new Graph(10,3,1920,1080);
-		graph.init(this);
+		graph.init(this,scale);
 
 	}
 
@@ -69,6 +69,7 @@ public class World {
 		update_window_dims();
 		for (Object object : this.objects) {
 			// Consider drawing threads to send and read data to the GPU.
+			graph.update();
 			object.get_component(SpriteRenderer.class).update(dt);
 		}
 	}
