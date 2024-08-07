@@ -19,6 +19,19 @@ class Node {
 	}
 }
 
+class Edge {
+	public int src;
+	public int dst;
+
+	public int id;
+
+	public Edge(int id, int src, int dst) {
+		this.src = src;
+		this.dst = dst;
+		this.id = id;
+	}
+}
+
 public class Graph {
 	float min_distance;
 	float max_distance;
@@ -32,8 +45,7 @@ public class Graph {
 	World world;
 
 	Vector<Node> nodes = new Vector<>();
-	Map<Integer,Integer> edges = new HashMap<Integer,Integer>();
-	Vector<Integer> edge_sprite_ids = new Vector<>();
+	Vector<Edge> edges = new Vector<>();
 
 	private int random_int(int a, int b) {
 		return (int)(random() * (b-a) + a);
@@ -59,11 +71,8 @@ public class Graph {
 		this.height = height;
 	}
 
-	private void add_edge(int src_node, int dst_node) {
-		if (edges.containsKey(src_node) && edges.get(src_node) == dst_node) { return; }
-		if (edges.containsKey(dst_node) && edges.get(dst_node) == src_node) { return; }
-		edges.put(src_node,dst_node);
-		edges.put(dst_node,src_node);
+	private void add_edge(int edge_index, int src_node, int dst_node) {
+		edges.add(new Edge(edge_index, src_node, dst_node));
 	}
 
 	private void translate_node(int node_index, float x, float y, float angle) {
@@ -73,6 +82,14 @@ public class Graph {
 		Object object = world.objects.get(node.sprite_id);
 		object.translate(x,y);
 		object.rotate(angle);
+	}
+
+	private void update_edge(int edge_index, int src, int dst) {
+		Node src_node = this.nodes.get(src);
+		Node dst_node = this.nodes.get(dst);
+		Object object = world.objects.get(edge_index);
+		object.translate(0.01f,0.0);
+		//object.rotate(angle);
 	}
 
 	public void init(World world,float cell_size) {
@@ -91,7 +108,6 @@ public class Graph {
 		for (int i = 0; i < node_count; i++) {
 			for (int j = 0; j < edge_count; j++) {
 				int other_ind = random_int(0,node_count);
-				add_edge(i,other_ind);
 
 				Node src = this.nodes.get(i);
 				Node dst = this.nodes.get(other_ind);
@@ -103,25 +119,22 @@ public class Graph {
 				float centre_y = (src.y + dst.y) / 2;
 
 				world.new_object(centre_x,centre_y,angle,(int)(distance / cell_size),1);
-				edge_sprite_ids.add(world.objects.size()-1);
+				add_edge(world.objects.size()-1,i,other_ind);
 			}
 		}
 	}
 
 	public void update() {
+		int src;
 		int dst;
 
 		Node src_node;
 		Node dst_node;
 
-		for (Integer src: this.edges.keySet()) {
-			dst = this.edges.get(src);
+		for (Edge edge : this.edges) {
+			translate_node(edge.src,0.01f,0.0f,0.0f);
 
-			translate_node(src,1.0f,0.0f,0.0f);
-		}
-
-		for (Integer edge: this.edge_sprite_ids) {
-			translate_node(edge,1.0f,0.0f,0.0f);
+			update_edge(edge.id,edge.src,edge.dst);
 		}
 	}
 }
