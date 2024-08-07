@@ -11,6 +11,7 @@ import org.joml.Vector2f;
 import org.lwjgl.BufferUtils;
 
 import java.nio.IntBuffer;
+import java.util.Vector;
 
 import static java.lang.Math.PI;
 import static java.lang.Math.random;
@@ -19,12 +20,13 @@ import static org.lwjgl.opengl.GL11.glReadPixels;
 
 // A collection of objects which are all drawn to the screen
 public class World {
-	private Object[] objects;
+	private Vector<Object> objects = new Vector<>();
 	private float scale;
 
 	private TextureGenerator texture_generator = null;
 	private Camera camera;
 	private Shader shader;
+	private Graph graph;
 
 	private double world_width = 0;
 	private double world_height = 0;
@@ -49,33 +51,25 @@ public class World {
 		shader = new Shader("assets/shaders/default.glsl");
 		shader.compile();
 
-		int count = 10;
+		graph = new Graph(10,3,1920,1080);
+		graph.init(this);
 
-		this.objects = new Object[count];
-		for (int i = 0; i < count; i++) {
-			this.objects[i] = new_object(100*i,500,(float)PI,50,50);
-		}
 	}
 
-	private Object new_object(float x, float y, float angle, int width, int height) {
+	public void new_object(float x, float y, float angle, int width, int height) {
 		Object object = new Object(new Transform(x,y,angle),width,height);
 		object.get_component(SpriteRenderer.class).scale((float)width, (float)height);
 		object.get_component(SpriteRenderer.class).scale(this.scale,this.scale);
 		object.get_component(SpriteRenderer.class).rotate((float)object.get_transform().angle);
-		return object;
+
+		this.objects.add(object);
 	}
 
 	public void update(float dt) {
 		update_window_dims();
 		for (Object object : this.objects) {
-			if (random() < 0.4) object.set_pixel(object.get_width()/2,object.get_height() -1,31,31,0,1);
-			if (random() < 0.4) object.set_pixel(object.get_width()/2,object.get_height() -1,0,0,31,1);
-			if (random() < 0.4) object.set_pixel(object.get_width()/2,0,31,31,31,1);
 			// Consider drawing threads to send and read data to the GPU.
 			object.get_component(SpriteRenderer.class).update(dt);
-			object.get_component(ParticleUpdate.class).update(dt);
-			//object.translate(30 * dt,0 * dt);
-			object.rotate(-0.7f * dt);
 		}
 	}
 

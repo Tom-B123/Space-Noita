@@ -29,16 +29,22 @@ public class Object {
 		add_component(new SpriteRenderer());
 		get_component(SpriteRenderer.class).init();
 
+		for (int x = 0; x < width; x++) {
+			for (int y = 0; y < height; y++) {
+				set_pixel(x,y,31,31,31,1);
+			}
+		}
 
-		add_component(new ParticleUpdate());
-		get_component(ParticleUpdate.class).init();
+
+		//add_component(new ParticleUpdate());
+		//get_component(ParticleUpdate.class).init();
 	}
 
 	public void set_pixel(int x, int y, int r, int g, int b,int a) {
 		int index = (x + y * this.width);
 		short colour = (short)(a + (b << 1) + (g << 6) + (r << 11));
 		this.data[index] = colour;
-		this.get_component(ParticleUpdate.class).refresh_pixels();
+		//this.get_component(ParticleUpdate.class).refresh_pixels();
 	}
 
 	public int get_width() { return this.width; }
