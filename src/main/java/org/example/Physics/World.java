@@ -52,7 +52,7 @@ public class World {
 		shader.compile();
 
 		graph = new Graph(10,3,1920,1080);
-		graph.init(this,scale,30.0f,200.0f);
+		graph.init(this,scale,200.0f,220.0f);
 
 	}
 
@@ -69,7 +69,7 @@ public class World {
 		update_window_dims();
 		for (Object object : this.objects) {
 			// Consider drawing threads to send and read data to the GPU.
-			graph.update();
+			graph.update(dt);
 			object.get_component(SpriteRenderer.class).update(dt);
 		}
 	}

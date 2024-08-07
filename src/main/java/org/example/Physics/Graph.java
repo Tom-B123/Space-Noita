@@ -147,7 +147,7 @@ public class Graph {
 		}
 	}
 
-	public void update() {
+	public void update(float dt) {
 		Node src_node;
 		Node dst_node;
 
@@ -162,15 +162,15 @@ public class Graph {
 			float distance = (float)get_distance(src_node.x,src_node.y,dst_node.x,dst_node.y);
 			if (distance < min_distance) {
 
-				ox = ((dst_node.x - src_node.x) / distance) * (min_distance - distance);
-				oy = ((dst_node.y - src_node.y) / distance) * (min_distance - distance);
+				ox = ((dst_node.x - src_node.x) / distance) * (min_distance - distance) * 0.01f * dt;
+				oy = ((dst_node.y - src_node.y) / distance) * (min_distance - distance) * 0.01f * dt;
 
 				translate_node(edge.src,ox ,oy, 0.0f);
 			}
 			if (distance > max_distance) {
 
-				ox = ((dst_node.x - src_node.x) / distance) * (distance - max_distance);
-				oy = ((dst_node.y - src_node.y) / distance) * (distance - max_distance);
+				ox = ((dst_node.x - src_node.x) / distance) * (distance - max_distance) * 0.01f * dt;
+				oy = ((dst_node.y - src_node.y) / distance) * (distance - max_distance) * 0.01f * dt;
 
 				translate_node(edge.src,ox ,oy, 0.0f);
 			}
