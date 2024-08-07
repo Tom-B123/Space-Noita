@@ -154,27 +154,47 @@ public class Graph {
 		float ox;
 		float oy;
 
+		float pull_power = 0.1f;
 
 		for (Edge edge : this.edges) {
 			src_node = this.nodes.get(edge.src);
 			dst_node = this.nodes.get(edge.dst);
 
 			float distance = (float)get_distance(src_node.x,src_node.y,dst_node.x,dst_node.y);
+
+			if (distance == 0) { continue; }
+
 			if (distance < min_distance) {
 
-				ox = ((dst_node.x - src_node.x) / distance) * (min_distance - distance) * 0.01f * dt;
-				oy = ((dst_node.y - src_node.y) / distance) * (min_distance - distance) * 0.01f * dt;
+				ox = ((-dst_node.x + src_node.x) / distance) * (min_distance - distance) * pull_power * dt;
+				oy = ((-dst_node.y + src_node.y) / distance) * (min_distance - distance) * pull_power * dt;
 
-				translate_node(edge.src,ox ,oy, 0.0f);
+				translate_node(edge.src, ox, oy, 0.0f);
 			}
 			if (distance > max_distance) {
 
-				ox = ((dst_node.x - src_node.x) / distance) * (distance - max_distance) * 0.01f * dt;
-				oy = ((dst_node.y - src_node.y) / distance) * (distance - max_distance) * 0.01f * dt;
+				ox = ((dst_node.x - src_node.x) / distance) * (distance - max_distance) * pull_power * dt;
+				oy = ((dst_node.y - src_node.y) / distance) * (distance - max_distance) * pull_power * dt;
 
 				translate_node(edge.src,ox ,oy, 0.0f);
 			}
 
+		}
+		for (int i = 0; i < this.nodes.size(); i++) {
+			for (int j = i+1; j < this.nodes.size(); j++) {
+				src_node = this.nodes.get(i);
+				dst_node = this.nodes.get(j);
+				float distance = (float)get_distance(src_node.x,src_node.y,dst_node.x,dst_node.y);
+
+				if (distance < min_distance) {
+
+					ox = ((-dst_node.x + src_node.x) / distance) * (min_distance - distance) * pull_power * dt;
+					oy = ((-dst_node.y + src_node.y) / distance) * (min_distance - distance) * pull_power * dt;
+
+					translate_node(i,ox ,oy, 0.0f);
+				}
+
+			}
 		}
 		for (Edge edge : this.edges) {
 			update_edge(edge.id,edge.src,edge.dst);
