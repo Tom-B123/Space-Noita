@@ -14,10 +14,17 @@ class Node {
 
 	public int sprite_id;
 
+	public Vector<Integer> edge_ids;
+
 	public Node(float x, float y, int sprite_id) {
 		this.x = x;
 		this.y = y;
 		this.sprite_id = sprite_id;
+		this.edge_ids = new Vector<>();
+	}
+
+	public void add_edge(int edge_id) {
+		this.edge_ids.add(edge_id);
 	}
 }
 
@@ -76,6 +83,8 @@ public class Graph {
 
 	private void add_edge(int edge_index, int src_node, int dst_node) {
 		edges.add(new Edge(edge_index, src_node, dst_node));
+		this.nodes.get(src_node).add_edge(edge_index);
+		this.nodes.get(dst_node).add_edge(edge_index);
 	}
 
 	private void translate_node(int node_index, float x, float y, float angle) {
