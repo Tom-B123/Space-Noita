@@ -163,7 +163,12 @@ public class Graph {
 		int tries = 0;
 		do { tries ++; }
 		while (this.update() > 10.0f && tries < 500);
+
+		// Add new nodes at intersections
 		this.get_all_intersections();
+
+		// Combine nearby nodes to minimise intersections
+		this.coalesce_nodes();
 	}
 
 	public float update() {
@@ -326,7 +331,7 @@ public class Graph {
 		return new float[]{intersection_x,intersection_y};
 	}
 
-	public void get_all_intersections() {
+	private void get_all_intersections() {
 		// Expect around n * edge_count ^3
 
 		int intersection_count = 0;
@@ -346,13 +351,60 @@ public class Graph {
 				if (!isNaN(intersect[0])) {
 
 					// Make a new node at the intersection point
-					world.new_object(intersect[0],intersect[1], (float)PI / 4,4,4);
+					world.new_object(intersect[0],intersect[1], 0.0f,2,2);
 					nodes.add(new Node(intersect[0],intersect[1],world.objects.size()-1));
 
 					intersection_count ++;
 				}
 			}
 		}
-		System.out.println("found [" + intersection_count + "] intersections!");
+	}
+
+	private void coalesce_nodes() {
+		// Number of nodes that need to be culled
+		int nodes_to_combine = this.nodes.size() - this.node_count;
+
+		// Temp values for comparing 2 nodes' positions
+		Node node1;
+		Node node2;
+
+		// Get the closest nodes
+		float closest_distance;
+		float temp_distance;
+		int closest_index_1;
+		int closest_index_2;
+
+		// Node1 will move by dx,dy to the centre point of node1 and node2, node2 will be deleted
+		float dx;
+		float dy;
+
+		for (int i = 0; i < nodes_to_combine; i++) {
+			closest_distance = Float.MAX_VALUE;
+			dx = 0.0f;
+			dy = 0.0f;
+			closest_index_1 = -1;
+			closest_index_2 = -1;
+			for (int j = 0; j < this.nodes.size(); j++) {
+				for (int k = j+1; k < this.nodes.size(); k++) {
+					node1 = this.nodes.get(j);
+					node2 = this.nodes.get(k);
+					temp_distance = (float)get_distance(node1.x,node1.y,node2.x,node2.y);
+					if (temp_distance < closest_distance) {
+						closest_distance = temp_distance;
+						closest_index_1 = j;
+						closest_index_2 = k;
+						dx = node2.x - (node1.x + node2.x) / 2;
+						dy = node2.y - (node1.y + node2.y) / 2;
+					}
+				}
+			}
+			// Move 1st node to centre and remove 2nd node
+			this.translate_node(closest_index_1,dx,dy,0.0f);
+			this.nodes.remove(closest_index_2);
+		}
+		// Move the edges to the new node positions
+		for (Edge edge : this.edges) {
+			update_edge(edge.id,edge.src,edge.dst);
+		}
 	}
 }
