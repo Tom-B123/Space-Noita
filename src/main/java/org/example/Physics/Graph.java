@@ -42,20 +42,22 @@ class Edge {
 }
 
 public class Graph {
-	float min_distance;
-	float max_distance;
+	private float min_distance;
+	private float max_distance;
 
-	int width;
-	int height;
+	private int width;
+	private int height;
 
-	int node_count;
-	int edge_count;
+	private int node_count;
+	private int edge_count;
 
-	World world;
-	float cell_size;
+	private World world;
+	private float cell_size;
 
-	Vector<Node> nodes = new Vector<>();
-	Vector<Edge> edges = new Vector<>();
+	private Vector<Node> nodes = new Vector<>();
+	private Vector<Edge> edges = new Vector<>();
+
+	private Map<String,Boolean> existing_edges = new HashMap<>();
 
 	private int random_int(int a, int b) {
 		return (int)(random() * (b-a) + a);
@@ -82,6 +84,7 @@ public class Graph {
 	}
 
 	private void add_edge(int edge_index, int src_node, int dst_node) {
+		if (src_node == dst_node) { System.out.println("self edge"); return; }
 		edges.add(new Edge(edge_index, src_node, dst_node));
 		//this.nodes.get(src_node).add_edge(edge_index);
 		//this.nodes.get(dst_node).add_edge(edge_index);
@@ -147,12 +150,11 @@ public class Graph {
 			x = random_int(0,width);
 			y = random_int(0,height);
 
-			world.new_object(x,y,0,2,2);
+			world.new_object(x,y,0,5,5);
 			nodes.add(new Node(x,y,world.objects.size()-1));
 		}
 
 		// Hold identifiers for node pairs
-		Map<String,Boolean> existing_edges = new HashMap<>();
 		// Generate edges
 		for (int i = 0; i < node_count; i++) {
 			for (int j = 0; j < edge_count; j++) {
@@ -164,7 +166,7 @@ public class Graph {
 				String key1 = src.sprite_id + "," + dst.sprite_id;
 				String key2 = dst.sprite_id + "," + src.sprite_id;
 
-				if (existing_edges.containsKey(key1) || existing_edges.containsKey(key2)) { System.out.println(existing_edges + " : " + key1); continue;}
+				if (existing_edges.containsKey(key1) || existing_edges.containsKey(key2)) { continue;}
 
 				existing_edges.put(key1,true);
 				existing_edges.put(key2,true);
@@ -180,62 +182,37 @@ public class Graph {
 			}
 		}
 
-		int tries = 0;
-		do { tries ++; }
-		while (this.update() > 10.0f && tries < 500);
+		this.separate(1000);
 
 		// Add new nodes at intersections
 		this.get_all_intersections();
 
+		this.separate(1000);
 		// Combine nearby nodes to minimise intersections
-		this.coalesce_nodes();
+		//this.coalesce_nodes();
 	}
 
-	public float update() {
+	public void separate(int n) {
+		for (int step = 0; step < n; step++) {
+			float movement = 0;
 
-		float movement = 0;
+			Node src_node;
+			Node dst_node;
 
-		Node src_node;
-		Node dst_node;
+			float ox;
+			float oy;
 
-		float ox;
-		float oy;
+			float pull_power = 0.01f;
 
-		float pull_power = 0.01f;
+			for (Edge edge : this.edges) {
+				src_node = this.nodes.get(edge.src);
+				dst_node = this.nodes.get(edge.dst);
 
-		for (Edge edge : this.edges) {
-			src_node = this.nodes.get(edge.src);
-			dst_node = this.nodes.get(edge.dst);
+				float distance = (float) get_distance(src_node.x, src_node.y, dst_node.x, dst_node.y);
 
-			float distance = (float)get_distance(src_node.x,src_node.y,dst_node.x,dst_node.y);
-
-			if (distance == 0) { continue; }
-
-			if (distance < min_distance) {
-
-				ox = ((-dst_node.x + src_node.x) / distance) * (min_distance - distance) * pull_power;
-				oy = ((-dst_node.y + src_node.y) / distance) * (min_distance - distance) * pull_power;
-
-				movement += abs(ox) + abs(oy);
-
-				translate_node(edge.src, ox, oy, 0.0f);
-			}
-			if (distance > max_distance) {
-
-				ox = ((dst_node.x - src_node.x) / distance) * (distance - max_distance) * pull_power;
-				oy = ((dst_node.y - src_node.y) / distance) * (distance - max_distance) * pull_power;
-
-				movement += abs(ox) + abs(oy);
-
-				translate_node(edge.src,ox ,oy, 0.0f);
-			}
-		}
-
-		for (int i = 0; i < this.nodes.size(); i++) {
-			for (int j = i+1; j < this.nodes.size(); j++) {
-				src_node = this.nodes.get(i);
-				dst_node = this.nodes.get(j);
-				float distance = (float)get_distance(src_node.x,src_node.y,dst_node.x,dst_node.y);
+				if (distance == 0) {
+					continue;
+				}
 
 				if (distance < min_distance) {
 
@@ -244,15 +221,41 @@ public class Graph {
 
 					movement += abs(ox) + abs(oy);
 
-					translate_node(i,ox ,oy, 0.0f);
+					translate_node(edge.src, ox, oy, 0.0f);
 				}
+				if (distance > max_distance) {
 
+					ox = ((dst_node.x - src_node.x) / distance) * (distance - max_distance) * pull_power;
+					oy = ((dst_node.y - src_node.y) / distance) * (distance - max_distance) * pull_power;
+
+					movement += abs(ox) + abs(oy);
+
+					translate_node(edge.src, ox, oy, 0.0f);
+				}
+			}
+
+			for (int i = 0; i < this.nodes.size(); i++) {
+				for (int j = i + 1; j < this.nodes.size(); j++) {
+					src_node = this.nodes.get(i);
+					dst_node = this.nodes.get(j);
+					float distance = (float) get_distance(src_node.x, src_node.y, dst_node.x, dst_node.y);
+
+					if (distance < min_distance) {
+
+						ox = ((-dst_node.x + src_node.x) / distance) * (min_distance - distance) * pull_power;
+						oy = ((-dst_node.y + src_node.y) / distance) * (min_distance - distance) * pull_power;
+
+						movement += abs(ox) + abs(oy);
+
+						translate_node(i, ox, oy, 0.0f);
+					}
+
+				}
+			}
+			for (Edge edge : this.edges) {
+				update_edge(edge.id, edge.src, edge.dst);
 			}
 		}
-		for (Edge edge : this.edges) {
-			update_edge(edge.id,edge.src,edge.dst);
-		}
-		return movement;
 	}
 
 	private float[] line_from(float x1, float y1, float x2, float y2) {
@@ -357,10 +360,14 @@ public class Graph {
 		int intersection_count = 0;
 		Edge edge1;
 		Edge edge2;
+
+		// Create a copy of the existing vector
+		Vector<Edge> n_edges = new Vector<>();
+		for (Edge edge : this.edges) { n_edges.add(edge);}
+
 		// For every edge combination:
 		for (int i = 0; i < this.edges.size(); i++) {
-			for (int j = i + 1; j < this.edges.size(); j++) {
-
+			for (int j = 0; j < this.edges.size(); j++) {
 				edge1 = this.edges.get(i);
 				edge2 = this.edges.get(j);
 
@@ -371,13 +378,82 @@ public class Graph {
 				if (!isNaN(intersect[0])) {
 
 					// Make a new node at the intersection point
-					world.new_object(intersect[0],intersect[1], 0.0f,2,2);
-					nodes.add(new Node(intersect[0],intersect[1],world.objects.size()-1));
+					world.new_object(intersect[0],intersect[1], 0.0f,5,5);
+
+					int node_id = world.objects.size()-1;
+
+					nodes.add(new Node(intersect[0],intersect[1],node_id));
+
+					// Move the existing edges to point to the new node:
+					// O   O
+					//  \ /
+					//   X
+					//  / \
+					// O   O
+
+					// ->
+
+					// O   O
+					//  \ /
+					//   O
+					//
+					// O   O
+					edge1.dst = nodes.size()-1;
+					edge2.dst = nodes.size()-1;
+
+					// Create new edges to replace the lost overlapping edge
+
+					// O   O
+					//  \ /
+					//   O
+					//
+					// O   O
+
+					// ->
+
+					// O   O
+					//  \ /
+					//   O
+					//  / \
+					// O   O
+
+					Node src1 = this.nodes.get(edge1.dst);
+					Node src2 = this.nodes.get(edge2.dst);
+					Node dst = this.nodes.get(nodes.size()-1);
+
+					String key1 = src1.sprite_id + "," + dst.sprite_id;
+					String key2 = dst.sprite_id + "," + src1.sprite_id;
+					String key3 = src2.sprite_id + "," + dst.sprite_id;
+					String key4 = dst.sprite_id + "," + src2.sprite_id;
+
+					//existing_edges.put(key1,true);
+					//existing_edges.put(key2,true);
+
+					float distance = (float)get_distance(src1.x,src1.y,dst.x,dst.y);
+					float angle = (float)(get_angle(src1.x,src1.y,dst.x,dst.y));
+
+					float centre_x = (src1.x + dst.x) / 2;
+					float centre_y = (src1.y + dst.y) / 2;
+
+					world.new_object(centre_x,centre_y,angle,(int)(distance / cell_size),1);
+					add_edge(world.objects.size()-1,edge1.dst,nodes.size()-1);
+
+					distance = (float)get_distance(src2.x,src2.y,dst.x,dst.y);
+					angle = (float)(get_angle(src2.x,src2.y,dst.x,dst.y));
+
+					centre_x = (src2.x + dst.x) / 2;
+					centre_y = (src2.y + dst.y) / 2;
+
+					world.new_object(centre_x,centre_y,angle,(int)(distance / cell_size),1);
+					add_edge(world.objects.size()-1,edge2.dst,nodes.size()-1);
 
 					intersection_count ++;
 				}
+				System.out.println(j + "," + i);
 			}
 		}
+		this.edges = n_edges;
+		System.out.println(intersection_count);
 	}
 
 	private void coalesce_nodes() {
