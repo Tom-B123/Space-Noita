@@ -83,8 +83,19 @@ public class Graph {
 
 	private void add_edge(int edge_index, int src_node, int dst_node) {
 		edges.add(new Edge(edge_index, src_node, dst_node));
-		this.nodes.get(src_node).add_edge(edge_index);
-		this.nodes.get(dst_node).add_edge(edge_index);
+		//this.nodes.get(src_node).add_edge(edge_index);
+		//this.nodes.get(dst_node).add_edge(edge_index);
+	}
+
+	private void remove_node(int node_index) {
+		Edge edge;
+		int i = 0;
+		while (i < this.edges.size()) {
+			edge = this.edges.get(i);
+			if (edge.src == node_index || edge.dst == node_index) { this.edges.remove(i); }
+			else { i ++; }
+		}
+		this.nodes.remove(node_index);
 	}
 
 	private void translate_node(int node_index, float x, float y, float angle) {
@@ -409,7 +420,7 @@ public class Graph {
 			}
 			// Move 1st node to centre and remove 2nd node
 			this.translate_node(closest_index_1,dx,dy,0.0f);
-			this.nodes.remove(closest_index_2);
+			this.remove_node(closest_index_2);
 		}
 		// Move the edges to the new node positions
 		for (Edge edge : this.edges) {
