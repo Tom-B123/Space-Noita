@@ -4,6 +4,8 @@ import org.example.Object.Object;
 
 import java.util.*;
 
+import static java.lang.Float.NaN;
+import static java.lang.Float.isNaN;
 import static java.lang.Math.*;
 
 class Node {
@@ -148,7 +150,8 @@ public class Graph {
 
 		int tries = 0;
 		do { tries ++; }
-		while (this.update() > 10.0f && tries < 20);
+		while (this.update() > 10.0f && tries < 500);
+		this.get_all_intersections();
 	}
 
 	public float update() {
@@ -161,7 +164,7 @@ public class Graph {
 		float ox;
 		float oy;
 
-		float pull_power = 0.1f;
+		float pull_power = 0.01f;
 
 		for (Edge edge : this.edges) {
 			src_node = this.nodes.get(edge.src);
@@ -213,5 +216,127 @@ public class Graph {
 			update_edge(edge.id,edge.src,edge.dst);
 		}
 		return movement;
+	}
+
+	private float[] line_from(float x1, float y1, float x2, float y2) {
+		return new float[]{(y1-y2)/(x1-x2), y1-((y1-y2)/(x1-x2)) * x1};
+	}
+
+	private float[] min_max(float[] vals) {
+		if  (vals[0] <= vals[1]) { return vals; }
+		float tmp = vals[0];
+		vals[0] = vals[1];
+		vals[1] = tmp;
+		tmp = vals[2];
+		vals[2] = vals[3];
+		vals[2] = tmp;
+		return vals;
+	}
+
+	private float[] get_intersection(Edge edge1, Edge edge2) {
+		float[] line1,line2;
+		float m1,c1,m2,c2;
+		boolean v1,v2;
+
+		Node a = this.nodes.get(edge1.src);
+		Node b = this.nodes.get(edge1.dst);
+		Node c = this.nodes.get(edge2.src);
+		Node d = this.nodes.get(edge2.dst);
+
+		v1 = a.x != b.x;
+		v2 = c.x != d.x;
+
+		if (!v1 && !v2) { return new float[]{NaN, NaN}; }
+
+		float[] min_max_1 = min_max(new float[] {a.x,b.x,a.y,b.y});
+		float[] min_max_2 = min_max(new float[] {c.x,d.x,c.y,d.y});
+
+		float min_x_1 = min_max_1[0];
+		float max_x_1 = min_max_1[1];
+		float min_y_1 = min_max_1[2];
+		float max_y_1 = min_max_1[3];
+
+		float min_x_2 = min_max_2[0];
+		float max_x_2 = min_max_2[1];
+		float min_y_2 = min_max_2[2];
+		float max_y_2 = min_max_2[3];
+
+		float[] starts = min_max(new float[] { min_x_1, min_x_2, min_y_1, min_y_2});
+
+		float start_x = starts[1];
+		float alt_start_y = starts[3];
+
+		float[] ends = min_max(new float[] { max_x_1, max_x_2, max_y_1, max_y_2});
+
+		float end_x = ends[0] ;
+		float alt_end_y = ends[2];
+
+		line1 = line_from(a.x,a.y,b.x,b.y);
+		line2 = line_from(c.x,c.y,d.x,d.y);
+
+		// Get the line M and C values for intersections
+		m1 = line1[0];
+		c1 = line1[1];
+		m2 = line2[0];
+		c2 = line2[1];
+
+		float start_y_1 = m1 * start_x + c1;
+		float start_y_2 = m2 * start_x + c2;
+
+		float end_y_1 = m1 * end_x + c1;
+		float end_y_2 = m2 * end_x + c2;
+
+		if (!v1) { start_y_1 = alt_start_y; end_y_1 = alt_end_y; }
+		if (!v2) { start_y_2 = alt_start_y; end_y_2 = alt_end_y; }
+
+		// If the min and max are bad, return out
+		if (!(
+			((max_x_1 >= min_x_2 && min_x_1 <= max_x_2) ||
+			(max_x_2 >= min_x_1 && min_x_2 <= max_x_1)) &&
+			(start_y_2 - start_y_1)*(end_y_2 - end_y_1) < 0
+		)) { return new float[]{NaN, NaN}; }
+
+		// Standard case
+		float intersection_x = (c2-c1)/(m1-m2);
+		float intersection_y = m1 * intersection_x + c1;
+
+		// Line 1 is invalid
+		if (!v1) {
+			intersection_x = this.nodes.get(edge1.src).x;
+			intersection_y = m2 * intersection_x + c2;
+		}
+		// Line 2 is invalid
+		if (!v2) {
+			intersection_x = this.nodes.get(edge2.src).x;
+			intersection_y = m1 * intersection_x + c1;
+		}
+
+		return new float[]{intersection_x,intersection_y};
+	}
+
+	public void get_all_intersections() {
+		// Expect around n * edge_count ^3
+
+		int intersection_count = 0;
+		Edge edge1;
+		Edge edge2;
+		// For every edge combination:
+		for (int i = 0; i < this.edges.size(); i++) {
+			for (int j = i + 1; j < this.edges.size(); j++) {
+
+				edge1 = this.edges.get(i);
+				edge2 = this.edges.get(j);
+
+				// Get the intersection points
+				float[] intersect = get_intersection(edge1,edge2);
+
+				// Ensure the intersection is valid
+				if (!isNaN(intersect[0])) {
+
+					intersection_count ++;
+				}
+			}
+		}
+		System.out.println("found [" + intersection_count + "] intersections!");
 	}
 }
