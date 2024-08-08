@@ -122,6 +122,7 @@ public class Graph {
 		int x;
 		int y;
 
+		// Generate nodes
 		for (int i = 0; i < node_count; i++) {
 			x = random_int(0,width);
 			y = random_int(0,height);
@@ -130,12 +131,24 @@ public class Graph {
 			nodes.add(new Node(x,y,world.objects.size()-1));
 
 		}
+
+		// Hold identifiers for node pairs
+		Map<String,Boolean> existing_edges = new HashMap<>();
+		// Generate edges
 		for (int i = 0; i < node_count; i++) {
 			for (int j = 0; j < edge_count; j++) {
 				int other_ind = random_int(0,node_count);
 
 				Node src = this.nodes.get(i);
 				Node dst = this.nodes.get(other_ind);
+
+				String key1 = src.sprite_id + "," + dst.sprite_id;
+				String key2 = dst.sprite_id + "," + src.sprite_id;
+
+				if (existing_edges.containsKey(key1) || existing_edges.containsKey(key2)) { System.out.println(existing_edges + " : " + key1); continue;}
+
+				existing_edges.put(key1,true);
+				existing_edges.put(key2,true);
 
 				float distance = (float)get_distance(src.x,src.y,dst.x,dst.y);
 				float angle = (float)(get_angle(src.x,src.y,dst.x,dst.y));
