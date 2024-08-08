@@ -14,7 +14,7 @@ class Node {
 
 	public int sprite_id;
 
-	public Node(int x, int y, int sprite_id) {
+	public Node(float x, float y, int sprite_id) {
 		this.x = x;
 		this.y = y;
 		this.sprite_id = sprite_id;
@@ -129,7 +129,6 @@ public class Graph {
 
 			world.new_object(x,y,0,2,2);
 			nodes.add(new Node(x,y,world.objects.size()-1));
-
 		}
 
 		// Hold identifiers for node pairs
@@ -205,8 +204,8 @@ public class Graph {
 
 				translate_node(edge.src,ox ,oy, 0.0f);
 			}
-
 		}
+
 		for (int i = 0; i < this.nodes.size(); i++) {
 			for (int j = i+1; j < this.nodes.size(); j++) {
 				src_node = this.nodes.get(i);
@@ -345,6 +344,10 @@ public class Graph {
 
 				// Ensure the intersection is valid
 				if (!isNaN(intersect[0])) {
+
+					// Make a new node at the intersection point
+					world.new_object(intersect[0],intersect[1], (float)PI / 4,4,4);
+					nodes.add(new Node(intersect[0],intersect[1],world.objects.size()-1));
 
 					intersection_count ++;
 				}

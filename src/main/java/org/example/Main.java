@@ -56,7 +56,7 @@ public class Main {
 
             window_draw = Time.get_time();
 
-            if (step % 10 == 9) { System.out.println(1/dt + "," + (window_update - start) + "," + (world_update - start) + "," + (world_draw - start) + "," + (window_draw - start)); }
+            //if (step % 10 == 9) { System.out.println(1/dt + "," + (window_update - start) + "," + (world_update - start) + "," + (world_draw - start) + "," + (window_draw - start)); }
         }
     }
 

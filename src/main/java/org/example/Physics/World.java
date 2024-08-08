@@ -51,7 +51,7 @@ public class World {
 		shader = new Shader("assets/shaders/default.glsl");
 		shader.compile();
 
-		graph = new Graph(10,200,1920,1080);
+		graph = new Graph(10,2,1920,1080);
 		graph.init(this,scale,100.0f,135.0f);
 
 		this.texture_generator.generate(objects.get(0).get_width(),objects.get(0).get_height(),objects.get(0).data);
